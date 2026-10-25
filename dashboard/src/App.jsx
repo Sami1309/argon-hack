@@ -189,7 +189,7 @@ export default function App() {
           <button className="icon-btn" onClick={() => setInspector((x) => !x)} title="Inspector">Inspect <kbd>I</kbd></button>
         </div>
       </header>
-      <main className="stage"><Boundary key={`${beat}-${live?.id || "replay"}`} onReset={stopLive}>
+      <main className={`stage ${live || banner ? "has-banner" : ""}`}><Boundary key={`${beat}-${live?.id || "replay"}`} onReset={stopLive}>
         {beat === 0 && <Problem {...props} />}
         {beat === 1 && <Evidence {...props} live={live && { stage: live.stage, status: live.status, approved: live.approved, sensor: live.stage_sensor }} onApprove={approve} />}
         {beat === 2 && <Twin {...props} />}
