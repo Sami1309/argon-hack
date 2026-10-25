@@ -56,6 +56,32 @@ def target_error_vs_human(prog, rigs):
     return dict(mean_mm=round(float(np.mean(errs)), 1), max_mm=round(float(np.max(errs)), 1), n=len(errs))
 
 
+_MOVE = re.compile(r"Move[JL]\s+(Offs\([^)]*\)|\w+)")
+
+
+def executed_targets(prog, rigs_fn):
+    """World-frame targets the program actually commands in the nominal run, keyed by (task, target expression).
+    Measured from the twin, so work objects and runtime frame fixes are accounted for."""
+    from simulation.scenarios import run_scenario, SUITE
+    w, _, _ = run_scenario(prog, rigs_fn, SUITE[0])
+    src = {f"T_{r}": prog[r][1].splitlines() for r in prog}
+    out = {}
+    for e in w.events:
+        if (e["kind"] == "move" or (e["kind"] == "violation" and e.get("type") == "unreachable")) and e.get("target") is not None:
+            m = _MOVE.search(src[e["task"]][e["line"] - 1]) if e.get("line") else None
+            if m: out.setdefault((e["task"], re.sub(r"\s+", "", m[1])), np.array(e["target"], float))
+    return out
+
+
+def executed_target_error(prog, rigs_fn):
+    """Per-target world distance (mm) between a program's executed targets and the human port's, same target expression."""
+    from simulation.cell import gofa_cell
+    mine, theirs = executed_targets(prog, rigs_fn), executed_targets(human_port_programs(), lambda: gofa_cell(human_port_bases()))
+    errs = [float(np.linalg.norm(mine[k] - theirs[k])) for k in theirs if k in mine]
+    if not errs: return dict(mean_mm=None, max_mm=None, n=0)
+    return dict(mean_mm=round(float(np.mean(errs)), 1), max_mm=round(float(np.max(errs)), 1), n=len(errs), of=len(theirs))
+
+
 def scoreboard(columns):
     """columns: {name: (programs, rigs_fn)} -> rows computed by code from real runs."""
     from simulation.scenarios import run_suite

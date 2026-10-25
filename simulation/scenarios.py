@@ -138,10 +138,12 @@ def _mc_one(args):
     sc = dict(id=f"mc_{seed}", kind="nominal", faults={k: ("prob", p) for k in GRIP_KINDS}, seed=seed)
     w, ends, r = run_scenario(programs, rigs_fn, sc)
     silent = any(v[0] == "silent_failure" for v in r["violations"])
+    hard = any(v[0] != "silent_failure" for v in r["violations"]) or "timeout" in ends.values()
     alarmed = bool(r["alarms"]) or any(str(e).startswith("unhandled error") for e in ends.values())
     misses = sum(1 for e in w.events if e["kind"] == "attach" and not e["ok"] and e.get("reason") == "injected missed grasp")
-    outcome = ("good" if r["passed"] else "silent_bad" if silent or (not r["delivered"] and not alarmed)
-               else "safe_stop" if alarmed else "other")
+    # good box | bad box the program believes is good | stop with an operator alarm | controller fault (unreachable, timeout)
+    outcome = ("good" if r["passed"] else "silent_bad" if silent or (not r["delivered"] and not alarmed and not hard)
+               else "safe_stop" if alarmed else "fault_stop")
     return dict(seed=seed, outcome=outcome, misses=misses, sim_time=r["sim_time"])
 
 
@@ -150,7 +152,7 @@ def monte_carlo(programs, rigs_fn, p, n=1000, seed0=0, workers=None):
     from concurrent.futures import ProcessPoolExecutor
     with ProcessPoolExecutor(workers) as ex:
         rows = list(ex.map(_mc_one, [(programs, rigs_fn, p, seed0 + i) for i in range(n)], chunksize=8))
-    cnt = {k: sum(r["outcome"] == k for r in rows) for k in ("good", "silent_bad", "safe_stop", "other")}
+    cnt = {k: sum(r["outcome"] == k for r in rows) for k in ("good", "silent_bad", "safe_stop", "fault_stop")}
     hours = sum(r["sim_time"] for r in rows) / 3600.0
     good_t = [r["sim_time"] for r in rows if r["outcome"] == "good"]
     return dict(p_miss=p, cycles=n, **cnt, cycles_with_miss=sum(r["misses"] > 0 for r in rows),

@@ -49,7 +49,7 @@ def check_quarantine(text, sources):
 
 
 def call(parts, *, label, run_dir, schema=None, json_out=False, thinking="medium", fps=5, system=None):
-    """parts: list of dicts {kind: text|video|file, data: str|bytes, source: str}. Returns (parsed JSON or text, meta).
+    """parts: list of dicts {kind: text|video|image|file, data: str|bytes, source: str}. Returns (parsed JSON or text, meta).
     kind=file sends a Files API uri (data) with its mime; json_out parses JSON without enforcing a schema."""
     run_dir = pathlib.Path(run_dir); run_dir.mkdir(parents=True, exist_ok=True)
     texts = "\n".join(p["data"] for p in parts if p["kind"] == "text") + (system or "")
@@ -60,6 +60,8 @@ def call(parts, *, label, run_dir, schema=None, json_out=False, thinking="medium
         manifest.append(dict(kind=p["kind"], source=p.get("source", "inline"), bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()[:16]))
         if p["kind"] == "text":
             gparts.append(types.Part(text=p["data"]))
+        elif p["kind"] == "image":
+            gparts.append(types.Part(inline_data=types.Blob(data=p["data"], mime_type=p.get("mime", "image/jpeg"))))
         elif p["kind"] == "file":
             gparts.append(types.Part(file_data=types.FileData(file_uri=p["data"], mime_type=p["mime"]), video_metadata=types.VideoMetadata(fps=fps)))
         else:

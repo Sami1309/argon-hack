@@ -71,7 +71,7 @@ def grip_rule(closed_on_nothing=0.9, commanded=0.5):
                 by_label={k: dict(flagged=v[0], total=v[1]) for k, v in per.items()}, flagged=flagged)
 
 
-def build(unified_path=UNIFIED):
+def build(unified_path=UNIFIED, out_path=OUT):
     segs, lab = segments(), labels()
     uni, vid = json.loads(pathlib.Path(unified_path).read_text()), json.loads(VIDEO_ONLY.read_text())
     flags = []
@@ -104,8 +104,8 @@ def build(unified_path=UNIFIED):
         counts={t: sum(f["type"] == t for f in flags) for t in sorted({f["type"] for f in flags})},
         disagreements=uni["response"].get("disagreements", []), legacy_hazard=uni["response"].get("legacy_hazard"),
         built_at=time.strftime("%Y-%m-%d %H:%M:%S"))
-    OUT.parent.mkdir(exist_ok=True)
-    OUT.write_text(json.dumps(out, indent=1))
+    out_path = pathlib.Path(out_path); out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(out, indent=1))
     return out
 
 

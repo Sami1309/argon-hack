@@ -14,6 +14,9 @@ brownfield_robot_inputs_candidate/
 third_party/
 models/assets/
 runs/
+demo_bundle/
+dashboard/node_modules/
+dashboard/dist/
 *.mp4
 *.webm
 *.hdf5

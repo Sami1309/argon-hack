@@ -34,7 +34,7 @@ LOOKS = {
       <quality shadowsize="8192" offsamples="8"/><map znear=".02" zfar="80" haze=".6" shadowclip="7"/></visual>
       <asset><texture name="sky" type="skybox" builtin="gradient" rgb1=".1 .115 .14" rgb2=".035 .04 .05" width="512" height="3072"/>
       <texture name="grid" type="2d" builtin="checker" rgb1=".2 .205 .215" rgb2=".185 .19 .2" width="512" height="512"/>
-      <material name="floor" texture="grid" texrepeat="60 60" reflectance=".015" specular=".05" shininess=".05"/>
+      <material name="floor" texture="grid" texrepeat="60 60" reflectance="0" specular=".05" shininess=".05"/>
       <material name="steel" rgba=".27 .29 .32 1" specular=".55" shininess=".6" reflectance=".03"/>
       <material name="alu" rgba=".62 .64 .67 1" specular=".6" shininess=".7"/>
       <material name="belt" rgba=".055 .058 .065 1" specular=".15" shininess=".2"/>
@@ -66,12 +66,17 @@ def _box(body, name, center_mm, half_mm, rgba, contype=0, material=None):
 
 def _marker(wb, name, kind, pos_mm):
     """Non-colliding marker geoms, hidden (alpha 0) until the renderer switches them on. Returns geom names + rgba."""
-    p = np.asarray(pos_mm, float) / 1000.0
+    p = np.asarray(pos_mm, float) / 1000.0 if not isinstance(pos_mm, dict) else None
     out = []
     def add(n, rgba, **kw):
-        wb.add_geom(name=n, rgba=[rgba[0], rgba[1], rgba[2], 0], contype=0, conaffinity=0, group=3, **kw); out.append((n, rgba))
-    if kind == "ghost":
-        add(f"{name}", (1.0, 0.25, 0.22, 0.38), type=mujoco.mjtGeom.mjGEOM_SPHERE, pos=p, size=[0.03, 0, 0])
+        wb.add_geom(name=n, rgba=[rgba[0], rgba[1], rgba[2], 0], contype=0, conaffinity=0, group=2, **kw); out.append((n, rgba))
+    if kind == "dot":      # intended target (small, neutral)
+        add(f"{name}", (0.85, 0.9, 0.95, 0.9), type=mujoco.mjtGeom.mjGEOM_SPHERE, pos=p, size=[0.03, 0, 0])
+    elif kind == "ghost":
+        add(f"{name}", (1.0, 0.25, 0.22, 0.55), type=mujoco.mjtGeom.mjGEOM_SPHERE, pos=p, size=[0.07, 0, 0])
+    elif kind == "link":   # intended target -> where the copied target lands
+        q = np.asarray(pos_mm["to"], float) / 1000.0; p0 = np.asarray(pos_mm["from"], float) / 1000.0
+        add(f"{name}", (1.0, 0.3, 0.25, 0.35), type=mujoco.mjtGeom.mjGEOM_CAPSULE, size=[0.006, 0, 0], fromto=[*p0, *q])
     elif kind == "ring":   # amber ring at a failed grasp
         for i in range(16):
             a0, a1 = 2 * np.pi * i / 16, 2 * np.pi * (i + 1) / 16

@@ -44,8 +44,8 @@ Propose the ONE sensor/input that would turn the dominant silent failure into a 
 - which of your cited episodes it would have caught."""
 
 
-def propose(run_dir):
-    s1 = stage1.load()
+def propose(run_dir, s1=None):
+    s1 = s1 or stage1.load()
     out, meta = argon_client.call([dict(kind="text", data=PROMPT.format(stage1=stage1.summary_text(s1)),
                                         source=f"Stage 1 findings ({stage1.OUT.relative_to(ROOT)}) + telemetry field names")],
                                   label="sensor_proposal", run_dir=run_dir, schema=SCHEMA, thinking="low")
@@ -74,9 +74,9 @@ def approve(by="engineer"):
     return s
 
 
-def facts():
+def facts(s=None):
     """Cell-facts line the loop adds once (and only once) the engineer has approved the sensor."""
-    s = load()
+    s = s or load()
     p = s["proposal"]["proposal"]
     return (f"- APPROVED SENSOR (proposed by you from Stage 1, verified on 218 real logs, approved by the engineer): "
             f"{WIRED_AS} (per robot; your proposal called it {p['signal']}) = 1 while the gripper holds a part. {p['meaning']}")

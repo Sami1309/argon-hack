@@ -8,7 +8,7 @@ Keep rule (training suite only): Cell Pass Rate rises; or it ties and the normal
 legacy reference); or both tie and the violation count falls. The nominal cycle time may grow by at most 10%. The held-out suite is scored for every kept and tried program but is never shown to
 Argon and never used in the decision.
 """
-import argparse, concurrent.futures as cf, json, pathlib, re, shutil, sys, time
+import argparse, concurrent.futures as cf, difflib, json, pathlib, re, shutil, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -131,6 +131,17 @@ def apply_patch(prog, patch):
     return out, changed, old
 
 
+def routine_diff(old, new):
+    """Line diff of a patched routine that ignores re-indentation: [{op: ' '|'+'|'-', text}]."""
+    a, b = (old or "").strip("\n").splitlines(), (new or "").strip("\n").splitlines()
+    sm = difflib.SequenceMatcher(a=[x.strip() for x in a], b=[x.strip() for x in b], autojunk=False)
+    out = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal": out += [dict(op=" ", text=t) for t in b[j1:j2]]
+        else: out += [dict(op="-", text=t) for t in a[i1:i2]] + [dict(op="+", text=t) for t in b[j1:j2]]
+    return out
+
+
 # ---------------------------------------------------------------- evaluation + evidence
 def evaluate(prog):
     """Training suite (decides keep/revert) and held-out suite (reported only)."""
@@ -189,8 +200,9 @@ def showcase(prog, s, run_dir, label):
                 truth_t=round(t_fail - t0, 2), truth_event=evs[0] if evs else None, trace=trace, result=res)
 
 
-def critique(prog, s, ev, history, run_dir, label, thinking):
-    stable = (f"{CELL_FACTS}\n{sensor.facts()}\n\n{stage1.summary_text()}\n\nSCENARIO SUITE (digital twin, sim-only faults "
+def critique(prog, s, ev, history, run_dir, label, thinking, context=None):
+    context = context or {}
+    stable = (f"{CELL_FACTS}\n{context.get('sensor_facts') or sensor.facts()}\n\n{context.get('stage1_text') or stage1.summary_text()}\n\nSCENARIO SUITE (digital twin, sim-only faults "
               f"mirroring the Stage 1 findings): " + "; ".join(f"{x['id']}" for x in SUITE)
               + ". nominal/once: every part must reach its destination with 0 violations. always/displaced: safe stop with alarm, "
               f"never continue as if holding.\n\n{GUIDE}\n\n{legacy_text()}")
@@ -207,9 +219,11 @@ def critique(prog, s, ev, history, run_dir, label, thinking):
 
 
 # ---------------------------------------------------------------- the loop
-def run(run_dir, iters=6, thinking="medium", port_thinking="medium", start=None, emit=print):
-    """emit(dict) receives every step (the dashboard's live mode streams these). Returns the metrics list."""
-    if not sensor.approved(): raise SystemExit("the grip sensor is not approved yet: python loop/sensor.py --approve")
+def run(run_dir, iters=6, thinking="medium", port_thinking="medium", start=None, emit=print, context=None):
+    """emit(dict) receives every step (the dashboard's live mode streams these). Returns the metrics list.
+    context: optional {stage1_text, sensor_facts} from a live Stage 1 + approval; defaults to the recorded ones."""
+    if not (context or {}).get("sensor_facts") and not sensor.approved():
+        raise SystemExit("the grip sensor is not approved yet: python loop/sensor.py --approve")
     run_dir = pathlib.Path(run_dir).resolve(); run_dir.mkdir(parents=True, exist_ok=True)
     t_run = time.time()
     if start:
@@ -235,7 +249,7 @@ def run(run_dir, iters=6, thinking="medium", port_thinking="medium", start=None,
         d = run_dir / f"iter{k:02d}"; d.mkdir(exist_ok=True)
         ev = showcase(prog, s, d, f"iter{k:02d}")
         emit(dict(ev="watching", iter=k, scenario=ev["scenario"], clip=str(ev["clip"].relative_to(ROOT))))
-        out, meta = critique(prog, s, ev, history, d, f"iter{k:02d}_critique", thinking)
+        out, meta = critique(prog, s, ev, history, d, f"iter{k:02d}_critique", thinking, context)
         p = out["patch"]
         emit(dict(ev="patch", iter=k, task=p["task"], routine=p["routine"], failure_time_s=out["failure_time_s"],
                   root_cause=out["root_cause"], latency_s=meta["latency_s"]))
