@@ -25,5 +25,6 @@ dashboard/dist/
 *.tar
 .DS_Store
 
-# progress gallery is shared
+# progress gallery and the project README are shared
 !progress/README.md
+!README.md
