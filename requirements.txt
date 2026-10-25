@@ -1,0 +1,13 @@
+mujoco==3.17.0
+numpy
+scipy
+pandas
+pyarrow
+google-genai==2.33.0
+requests
+imageio
+imageio-ffmpeg
+opencv-python-headless
+pillow
+trimesh
+pycollada

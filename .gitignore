@@ -1,0 +1,23 @@
+# secrets
+.env
+.env.local
+# python
+.venv/
+__pycache__/
+*.pyc
+# docs stay local
+*.md
+# data, downloads, generated artifacts
+new/
+brownfield_robot_inputs_candidate/
+*.tar.xz
+third_party/
+models/assets/
+runs/
+*.mp4
+*.webm
+*.hdf5
+*.parquet
+*.rspag
+*.tar
+.DS_Store
