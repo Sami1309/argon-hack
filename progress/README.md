@@ -271,4 +271,5 @@ python tools/build_demo.py --loop runs/loop_final_d --repeats runs/loop_final_a,
 python dashboard/server.py                              # http://127.0.0.1:8787  (→ ← beats, L live, I inspector, P play)
 ```
 Quick demo: Replay (instant). Longer: `L` → live loop from a cached port (~2 min) or the full pipeline (~6 min, with the
-sensor approval as the human step).
+sensor approval as the human step). Live streams every step: Argon watching the clip, its root cause and patch, each of
+the 15 scenarios as it is scored, then keep/revert. Reloading the page re-attaches to a running live run; "Stop" cancels it.

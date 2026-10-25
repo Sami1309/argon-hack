@@ -10,7 +10,7 @@ function Board({ b }) {
     ["Held-out scenarios", "never shown to Argon", (r) => `${r.heldout_pass}/${r.heldout_n}`],
     ["Faults handled", "of 9 injected", (r) => `${r.fault_pass}/${r.faults}`],
     ["Good boxes · safe stops", `${int(b.proof.mc_meta.n || 1000)}-cycle shift sim, 6% miss per grasp`, (r) => (mc(r, "0.06", "good") == null ? "–" : `${int(mc(r, "0.06", "good"))} · ${int(mc(r, "0.06", "safe_stop"))}`)],
-    ["Bad boxes shipped as good", "same shift: silent failures", (r) => int(mc(r, "0.06", "silent_bad"))],
+    ["Bad boxes shipped as good", "silent failures, same shift", (r) => int(mc(r, "0.06", "silent_bad"))],
     ["Target error vs engineer’s port", "mean / max", (r) => (r.target_err?.mean_mm == null ? "—" : r.key === "verbatim" ? `${(r.target_err.mean_mm / 1000).toFixed(1)} / ${(r.target_err.max_mm / 1000).toFixed(1)} m` : `${r.target_err.mean_mm} / ${r.target_err.max_mm} mm`)],
   ];
   return (
@@ -48,7 +48,7 @@ function Agents({ b }) {
             <span className={`badge ${x.matches_local ? "good" : "warn"}`} style={{ marginTop: 4 }}>{x.matches_local ? "✓ matches local" : "≠ local"}</span></div>
         </div>
       ))}
-      <div className="muted" style={{ fontSize: 12.5, marginTop: 10 }}>Fan-out wall time {sec(a.fanout_wall_s, 0)}. Each agent is a custom Gemini Managed Agent on gemini-4-argon in its own remote sandbox: it rebuilt the twin from public sources and re-ran the suites independently. The engineer’s port never enters a sandbox (answer-key quarantine).</div>
+      <div className="muted" style={{ fontSize: 12.5, marginTop: 10 }}>Parallel fan-out, {sec(a.fanout_wall_s, 0)} wall. Custom managed agents on gemini-4-argon, one remote sandbox each, built from public sources. The engineer’s port never leaves this machine.</div>
     </div>
   );
 }
@@ -63,8 +63,8 @@ export default function Proof({ b, step }) {
       <div className="beat-head">
         <div>
           <div className="eyebrow">05 · Proof</div>
-          <h2 className="headline">{step === 0 ? "Same fault. The engineer’s port fails silently; Argon’s re-grips." : "Independently re-checked, and ready for Monday."}</h2>
-          <div className="subline">{step === 0 ? "R1 misses the tray once. Both programs run on the same twin, same seed, same moment." : "Managed agents rebuilt the twin from public sources in their own sandboxes and re-ran every check. The hand-off is the ported program plus the evidence."}</div>
+          <h2 className="headline">{step === 0 ? "Same fault. The engineer’s port fails silently. Argon’s re-grips." : "Re-checked independently. Ready for Monday."}</h2>
+          <div className="subline">{step === 0 ? "R1 misses the tray once. Same twin, same fault." : "Four managed agents rebuilt the twin in their own sandboxes and re-ran every check."}</div>
         </div>
         {step === 0 && <button className="icon-btn" onClick={() => setNonce((n) => n + 1)}>↺ Replay both</button>}
       </div>

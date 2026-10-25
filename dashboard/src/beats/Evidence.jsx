@@ -65,7 +65,7 @@ function Tokens({ tk, src }) {
   const parts = [["Video · 18:57 shift at 3 fps", tk.video, "var(--blue)"], ["Telemetry · 218 episodes at 5 Hz", tk.telemetry, "var(--aqua)"], ["Legacy RAPID + PLC code", tk.code, "var(--yellow)"]];
   return (
     <div className="panel">
-      <div className="panel-head"><span className="panel-title">One Argon call, one context</span><span className="faint num" style={{ fontSize: 12 }}>{src.latency_s} s</span></div>
+      <div className="panel-head"><span className="panel-title">Stage 1 · one Argon call</span><span className="faint num" style={{ fontSize: 12 }}>{src.latency_s} s</span></div>
       <div className="panel-body">
         <div className="big-stat num">{int(tk.total)}<span style={{ fontSize: 18, color: "var(--text-2)", fontWeight: 500 }}> tokens</span></div>
         <div className="tokenbar" style={{ marginTop: 14 }}>{parts.map(([l, v, c]) => <div key={l} title={`${l}: ${int(v)}`} style={{ flex: v, background: c }} />)}</div>
@@ -84,15 +84,15 @@ function Findings({ ev, seek, twinMiss }) {
     <div className="panel">
       <div className="panel-head"><span className="panel-title">What Argon found</span><span className="badge bad">● {missed.length} of {ev.flags.length} flagged: missed grasp</span></div>
       <div className="panel-body">
-        <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35 }}>The gripper closes on nothing, and the arm carries on as if it held the block.</div>
+        <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35 }}>The gripper closes on nothing and the arm continues as if holding the block.</div>
         {missed.slice(0, 3).map((f) => (
           <div key={f.seg} className="quote" onClick={() => seek(f.t - 1.5)}><span className="when">{mmss(f.t)}</span>{f.evidence.replace(/^seg \d+:\s*/, "")}</div>
         ))}
         <div className="muted" style={{ fontSize: 13, marginTop: 10 }}>
-          Against the dataset’s labels (which Argon never saw): {a.both} of {a.dataset_failures} labelled failures found, plus {a.argon_only.length} the labels
-          miss, including a hidden re-grasp in an episode labelled “success”.
+          Vs. dataset labels (not shown to Argon): {a.both}/{a.dataset_failures} labelled failures found, plus {a.argon_only.length} the labels missed,
+          including a re-grasp in an episode labelled “success”.
         </div>
-        <div className="panel-title" style={{ margin: "16px 0 8px" }}>The fault we inject is the fault we saw</div>
+        <div className="panel-title" style={{ margin: "16px 0 8px" }}>Real missed grasp vs. injected twin fault</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <Clip src={ev.real_clip} controls={false} style={{ aspectRatio: "16/9" }} tags={["real · missed grasp"]} />
           <Clip src={twinMiss} controls={false} style={{ aspectRatio: "16/9" }} tags={["twin · injected miss"]} rate={1.5} />
@@ -108,13 +108,22 @@ function CodeCard({ ev }) {
     <div className="panel" style={{ minHeight: 0 }}>
       <div className="panel-head"><span className="panel-title">Legacy RAPID · {c.file} · PROC PP_TAB_CONV</span><span className="badge warn">▲ open-loop grip</span></div>
       <div className="panel-body flush" style={{ padding: "8px 0" }}><Source lines={c.lines} from={c.focus[0] - 3} to={c.focus[1] + 4} lit={c.lit} /></div>
-      <div className="code-note">Lines {c.lit[0]}–{c.lit[1]}: pulse the gripper, wait 0.25 s, move on. Nothing checks that the part is there. Same pattern at every grip in both tasks.</div>
+      <div className="code-note">Lines {c.lit[0]}–{c.lit[1]}: pulse, wait 0.25 s, continue. No grip check, at every grip in both tasks.</div>
     </div>
   );
 }
 
 function SensorCard({ ev, live, onApprove }) {
-  const s = ev.sensor, p = s.proposal.proposal, v = s.verification.by_label;
+  const ls = live?.sensor?.proposal ? { ...ev.sensor, proposal: live.sensor.proposal, verification: live.sensor.verification } : null;
+  const s = ls || ev.sensor, p = s.proposal.proposal, v = s.verification.by_label;
+  if (live && (live.stage === "stage1" || (live.stage === "sensor" && !ls))) {
+    return (
+      <div className="panel"><div className="panel-body" style={{ display: "grid", gap: 10 }}>
+        <span className="label-tag" style={{ justifySelf: "start" }}>live</span>
+        <div className="thinking"><div className="spinner" />{live.stage === "stage1" ? "Stage 1: Argon is reading the shift video, logs and code" : "Argon is proposing a sensor"}</div>
+      </div></div>
+    );
+  }
   const [ok, setOk] = useState(false);
   const liveWaiting = live?.stage === "sensor" && live.status === "awaiting_approval";
   const approved = ok || live?.approved;
@@ -122,7 +131,7 @@ function SensorCard({ ev, live, onApprove }) {
   const other = Object.entries(v).filter(([k]) => k !== "success" && k !== "missed_grasp").reduce((a, [, x]) => [a[0] + x.flagged, a[1] + x.total], [0, 0]);
   return (
     <div className="panel">
-      <div className="panel-head"><span className="panel-title">Argon’s proposal · the one decision for the engineer</span><span className="label-tag">proposed sensor</span></div>
+      <div className="panel-head"><span className="panel-title">Argon’s proposal · needs engineer approval</span><span className="label-tag">{ls ? "live proposal" : "proposed sensor"}</span></div>
       <div className="panel-body">
         <div style={{ fontSize: 17, fontWeight: 600 }}>Add a grip-confirmation input on each GoFa</div>
         <div className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>{p.meaning}</div>
@@ -131,13 +140,13 @@ function SensorCard({ ev, live, onApprove }) {
           <span className="k">Rule on logs</span><span className="mono" style={{ fontSize: 12 }}>{s.verification.rule}</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 14 }}>
-          <div><div className="big-stat num" style={{ fontSize: 30 }}>{mg.flagged}/{mg.total}</div><div className="stat-label">real missed grasps caught</div></div>
+          <div><div className="big-stat num" style={{ fontSize: 30 }}>{mg.flagged}/{mg.total}</div><div className="stat-label">real missed grasps flagged</div></div>
           <div><div className="big-stat num" style={{ fontSize: 30 }}>{other[0]}/{other[1]}</div><div className="stat-label">other failures flagged</div></div>
-          <div><div className="big-stat num" style={{ fontSize: 30 }}>{succ.flagged}/{succ.total}</div><div className="stat-label">“successes” flagged: the hidden re-grasp</div></div>
+          <div><div className="big-stat num" style={{ fontSize: 30 }}>{succ.flagged}/{succ.total}</div><div className="stat-label">“successes” flagged (the hidden re-grasp)</div></div>
         </div>
         <button className={`approve ${approved ? "done" : ""}`} disabled={approved}
                 onClick={() => { if (liveWaiting) onApprove?.(); setOk(true); }}>
-          {approved ? `✓ Approved · wired as ${s.approval?.wired_as || "DI_GRIP_OK"}` : liveWaiting ? "Approve DI_GRIP_OK (live run is waiting)" : "Approve DI_GRIP_OK"}
+          {approved ? `✓ Approved · wired as ${s.approval?.wired_as || "DI_GRIP_OK"}` : liveWaiting ? "Approve DI_GRIP_OK · live run waiting" : "Approve DI_GRIP_OK"}
         </button>
       </div>
     </div>
@@ -156,8 +165,8 @@ export default function Evidence({ b, step, live, onApprove }) {
       <div className="beat-head">
         <div>
           <div className="eyebrow">02 · Evidence</div>
-          <h2 className="headline">{step === 0 ? "Argon watched the whole shift, read the logs and the code at once." : "Missed grasps are what fail, and the legacy code never checks the grip."}</h2>
-          <div className="subline">{step === 0 ? `${int(ev.tokens.total)} tokens in one context: what the camera saw, what the gripper measured and what the program commanded.` : "Argon proposes the fix in hardware first; the rule behind it is checked on every real episode before anyone approves it."}</div>
+          <h2 className="headline">{step === 0 ? "Argon reads the shift video, robot logs and legacy code in one context." : "Missed grasps cause most failures. The legacy code never checks the grip."}</h2>
+          <div className="subline">{step === 0 ? `${int(ev.tokens.total)} tokens, one call.` : "Argon proposes a grip sensor. Its rule is checked against all 218 real episodes before approval."}</div>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1.35fr 1fr", gap: 18, minHeight: 0 }}>

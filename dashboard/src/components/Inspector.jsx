@@ -14,7 +14,7 @@ export default function Inspector({ b, onClose }) {
       <div className="panel-body" style={{ flex: 1 }}>
         {tab === "calls" && (
           <>
-            <div className="muted" style={{ fontSize: 13, marginBottom: 12 }}>Every Argon call behind this demo: what went in (by source), tokens by modality, latency. {int(total)} tokens in total. Each call passed the answer-key quarantine (no engineer’s-port paths or target literals).</div>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 12 }}>Every Argon call: inputs by source, tokens by modality, latency. {int(total)} tokens total. All passed the answer-key quarantine.</div>
             {b.calls.map((c, i) => {
               const mods = c.usage?.prompt_tokens_details || [];
               return (

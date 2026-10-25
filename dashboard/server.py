@@ -19,6 +19,10 @@ from fastapi.staticfiles import StaticFiles  # noqa: E402
 
 app = FastAPI(title="Argon cell port")
 RUNS, LOCK = {}, threading.Lock()
+
+
+class LiveCancelled(Exception):
+    pass
 BUNDLE, DIST = ROOT / "demo_bundle", ROOT / "dashboard/dist"
 
 
@@ -41,9 +45,14 @@ class LiveRun:
         self.mode, self.start, self.events, self.cv = mode, start, [], threading.Condition()
         self.dir = ROOT / "runs" / self.id
         self.approved = threading.Event()
-        self.finished = False
+        self.finished = self.cancelled = False
 
-    def emit(self, e):
+    @property
+    def active(self):
+        return not (self.finished or self.cancelled)
+
+    def emit(self, e, final=False):
+        if self.cancelled and not final: raise LiveCancelled("cancelled from the dashboard")
         e = dict(e, t_wall=round(time.time(), 2))
         if e.get("ev") == "watching" and e.get("clip"): e["clip_url"] = "/" + e["clip"]
         if e.get("ev") == "iteration" and e.get("iter", 0) > 0:
@@ -83,9 +92,10 @@ class LiveRun:
                 start = _single_pass_dirs()[self.start]
             self.emit(dict(ev="stage", stage="loop", status="running", start=self.start if start else "live single pass"))
             run_loop.run(self.dir, iters=8, start=start, emit=self.emit, context=context)
-            self.emit(dict(ev="finished", run=self.id))
+            self.emit(dict(ev="finished", run=self.id), final=True)
         except BaseException as ex:  # SystemExit included: surface every failure to the UI
-            self.emit(dict(ev="error", message=f"{type(ex).__name__}: {ex}", trace=traceback.format_exc()[-1500:]))
+            if self.cancelled: self.emit(dict(ev="cancelled"), final=True)
+            else: self.emit(dict(ev="error", message=f"{type(ex).__name__}: {ex}", trace=traceback.format_exc()[-1500:]), final=True)
         finally:
             self.finished = True
             with self.cv: self.cv.notify_all()
@@ -96,7 +106,7 @@ def live_start(body: dict):
     mode, start = body.get("mode", "loop"), body.get("start", "buggy")
     if mode not in ("loop", "full") or start not in ("buggy", "clean"): raise HTTPException(400, "bad mode/start")
     with LOCK:
-        if any(not r.finished for r in RUNS.values()): raise HTTPException(409, "a live run is already in progress")
+        if any(r.active for r in RUNS.values()): raise HTTPException(409, "a live run is already in progress")
         r = LiveRun(mode, start); RUNS[r.id] = r
     threading.Thread(target=r.run, daemon=True).start()
     return {"id": r.id, "mode": mode, "start": start}
@@ -108,6 +118,14 @@ def live_approve(rid: str):
     RUNS[rid].approved.set(); return {"ok": True}
 
 
+@app.post("/api/live/cancel/{rid}")
+def live_cancel(rid: str):
+    if rid not in RUNS: raise HTTPException(404)
+    r = RUNS[rid]; r.cancelled = True; r.approved.set()
+    with r.cv: r.cv.notify_all()
+    return {"ok": True}
+
+
 @app.get("/api/live/stream/{rid}")
 def live_stream(rid: str):
     if rid not in RUNS: raise HTTPException(404)
@@ -117,8 +135,8 @@ def live_stream(rid: str):
         i = 0
         while True:
             with r.cv:
-                while i >= len(r.events) and not r.finished: r.cv.wait(timeout=10)
-                batch, done = r.events[i:], r.finished and i + len(r.events[i:]) >= len(r.events)
+                while i >= len(r.events) and r.active: r.cv.wait(timeout=10)
+                batch, done = r.events[i:], not r.active
             for e in batch:
                 yield f"data: {json.dumps(e, default=str)}\n\n"
             i += len(batch)
@@ -130,7 +148,8 @@ def live_stream(rid: str):
 
 @app.get("/api/live/runs")
 def live_runs():
-    return [dict(id=r.id, mode=r.mode, start=r.start, finished=r.finished, events=len(r.events)) for r in RUNS.values()]
+    return [dict(id=r.id, mode=r.mode, start=r.start, finished=r.finished, cancelled=r.cancelled, active=r.active, events=len(r.events))
+            for r in RUNS.values()]
 
 
 @app.get("/api/health")

@@ -120,11 +120,12 @@ def evaluate(w, ends, sc):
     return res
 
 
-def run_suite(programs, rigs_fn, suite=SUITE, verbose=True):
+def run_suite(programs, rigs_fn, suite=SUITE, verbose=True, on_row=None):
     rows = []
     for sc in suite:
         _, _, r = run_scenario(programs, rigs_fn, sc)
         rows.append(r)
+        if on_row: on_row(r)
         if verbose: print(f"  {'PASS' if r['passed'] else 'fail'}  {sc['id']:24s} {r['why']}")
     cpr = sum(r["passed"] for r in rows) / len(rows)
     return dict(cpr=cpr, nominal=[r["passed"] for r in rows if r["kind"] == "nominal"],

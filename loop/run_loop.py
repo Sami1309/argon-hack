@@ -143,10 +143,10 @@ def routine_diff(old, new):
 
 
 # ---------------------------------------------------------------- evaluation + evidence
-def evaluate(prog):
-    """Training suite (decides keep/revert) and held-out suite (reported only)."""
-    s = run_suite(prog, gofa_cell, verbose=False)
-    h = run_suite(prog, gofa_cell, suite=HELD_OUT, verbose=False)
+def evaluate(prog, on_row=None):
+    """Training suite (decides keep/revert) and held-out suite (reported only). on_row(row, suite) streams results."""
+    s = run_suite(prog, gofa_cell, verbose=False, on_row=(lambda r: on_row(r, "train")) if on_row else None)
+    h = run_suite(prog, gofa_cell, suite=HELD_OUT, verbose=False, on_row=(lambda r: on_row(r, "held")) if on_row else None)
     s["heldout"] = h["cpr"]; s["heldout_rows"] = h["rows"]
     nom = next(r for r in s["rows"] if r["id"] == "nominal")
     s["cycle_time"] = nom["sim_time"] if nom["passed"] else None
@@ -237,7 +237,8 @@ def run(run_dir, iters=6, thinking="medium", port_thinking="medium", start=None,
         prog, changes, meta = single_pass(run_dir, port_thinking)
         save_prog(prog, run_dir / "iter00")
         emit(dict(ev="single_pass", cached=False, latency_s=meta["latency_s"], changes=changes))
-    s = evaluate(prog)
+    rows_to = lambda k: (lambda r, suite: emit(dict(ev="scenario", iter=k, suite=suite, id=r["id"], passed=r["passed"], why=r["why"])))
+    s = evaluate(prog, rows_to(0))
     (run_dir / "iter00" / "suite.json").write_text(json.dumps(s, indent=1, default=str))
     metrics = [dict(iter=0, cpr=s["cpr"], heldout=s["heldout"], progress=s["progress"], fault_pass=s["fault_pass"], violations=s["violations"],
                     cycle_time=s["cycle_time"], kept=True, note="single-pass port", rows=rows_brief(s["rows"]),
@@ -256,7 +257,7 @@ def run(run_dir, iters=6, thinking="medium", port_thinking="medium", start=None,
         old = ""
         try:
             cand, nchg, old = apply_patch(prog, p)
-            cs = evaluate(cand)
+            cs = evaluate(cand, rows_to(k))
             keep, why = better(cs, s)
             reason = (f"{why}: CPR {s['cpr']:.0%}->{cs['cpr']:.0%}, cycle progress {s['progress']:.0%}->{cs['progress']:.0%}, "
                       f"violations {s['violations']}->{cs['violations']}, held-out {s['heldout']:.0%}->{cs['heldout']:.0%}")
@@ -323,7 +324,7 @@ def main():
     a = ap.parse_args()
     if a.single_pass_only: return single_pass_trials(a.trials, a.port_thinking)
     run_dir = pathlib.Path(a.resume or a.out or ROOT / f"runs/loop_{time.strftime('%Y%m%d_%H%M%S')}")
-    log = lambda e: print(time.strftime("%H:%M:%S"), json.dumps({k: v for k, v in e.items() if k not in ("rows", "heldout_rows")}, default=str)[:400], flush=True)
+    log = lambda e: e.get("ev") == "scenario" or print(time.strftime("%H:%M:%S"), json.dumps({k: v for k, v in e.items() if k not in ("rows", "heldout_rows")}, default=str)[:400], flush=True)
     m = run(run_dir, a.iters, a.thinking, a.port_thinking, start=a.start, emit=log)
     print("CPR by iteration:", [f"{x['cpr']:.0%}" for x in m], " held-out:", [f"{x['heldout']:.0%}" for x in m], "->", run_dir)
 
