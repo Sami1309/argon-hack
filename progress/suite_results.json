@@ -1,0 +1,182 @@
+{
+ "legacy @ IRB 1200": {
+  "cpr": 0.1,
+  "rows": {
+   "nominal": [
+    true,
+    "delivered"
+   ],
+   "r1_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_tray_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r1_part_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_part_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r1_part_displaced_20mm": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r2_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_tray_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r2_holder_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_holder_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ]
+  }
+ },
+ "legacy verbatim @ GoFa": {
+  "cpr": 0.0,
+  "rows": {
+   "nominal": [
+    false,
+    "not delivered"
+   ],
+   "r1_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_tray_miss_always": [
+    false,
+    "violations"
+   ],
+   "r1_part_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_part_miss_always": [
+    false,
+    "violations"
+   ],
+   "r1_part_displaced_20mm": [
+    false,
+    "violations"
+   ],
+   "r2_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_tray_miss_always": [
+    false,
+    "violations"
+   ],
+   "r2_holder_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_holder_miss_always": [
+    false,
+    "violations"
+   ]
+  }
+ },
+ "human port @ GoFa (held out)": {
+  "cpr": 0.1,
+  "rows": {
+   "nominal": [
+    true,
+    "delivered"
+   ],
+   "r1_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_tray_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r1_part_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r1_part_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r1_part_displaced_20mm": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r2_tray_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_tray_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ],
+   "r2_holder_miss_once": [
+    false,
+    "not delivered"
+   ],
+   "r2_holder_miss_always": [
+    false,
+    "silent failure: program continued as if holding the part"
+   ]
+  }
+ },
+ "guarded reference @ IRB (fixture)": {
+  "cpr": 1.0,
+  "rows": {
+   "nominal": [
+    true,
+    "delivered"
+   ],
+   "r1_tray_miss_once": [
+    true,
+    "delivered"
+   ],
+   "r1_tray_miss_always": [
+    true,
+    "safe stop with alarm"
+   ],
+   "r1_part_miss_once": [
+    true,
+    "delivered"
+   ],
+   "r1_part_miss_always": [
+    true,
+    "safe stop with alarm"
+   ],
+   "r1_part_displaced_20mm": [
+    true,
+    "safe stop with alarm"
+   ],
+   "r2_tray_miss_once": [
+    true,
+    "delivered"
+   ],
+   "r2_tray_miss_always": [
+    true,
+    "safe stop with alarm"
+   ],
+   "r2_holder_miss_once": [
+    true,
+    "delivered"
+   ],
+   "r2_holder_miss_always": [
+    true,
+    "safe stop with alarm"
+   ]
+  }
+ }
+}

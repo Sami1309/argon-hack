@@ -114,7 +114,7 @@ def run(robot, seq, base):
         else:
             q_prev = q
             nq, rep = robot.track_line(q, p, R)
-            rec["movel"] = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in rep.items()}
+            rec["movel"] = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in rep.items() if k != "samples"}
             if nq is None:
                 summ["movel_fail"] += 1; rec["ok"] = False; recs.append(rec)
                 q = min(sols, key=lambda s: np.abs(s - q).max()); continue

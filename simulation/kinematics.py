@@ -110,6 +110,7 @@ class Robot:
         mujoco.mju_mat2Quat(q0_, R0.ravel()); mujoco.mju_mat2Quat(q1_, R_end.ravel())
         if q0_ @ q1_ < 0: q1_ = -q1_
         q, min_sv, max_jump = np.array(q_start, float), np.inf, 0.0
+        samples = [q.copy()]
         for i in range(1, n + 1):
             t = i / n
             qi = q0_ * (1 - t) + q1_ * t; qi /= np.linalg.norm(qi)  # nlerp is fine at 2 mm steps
@@ -117,5 +118,5 @@ class Robot:
             if nq is None:
                 return None, dict(fail="unreachable", at=t, min_sv=min_sv, max_jump=max_jump)
             max_jump = max(max_jump, float(np.max(np.abs(nq - q))))
-            q = nq; min_sv = min(min_sv, self.min_sv(q))
-        return q, dict(fail=None, min_sv=min_sv, max_jump=max_jump)
+            q = nq; min_sv = min(min_sv, self.min_sv(q)); samples.append(q.copy())
+        return q, dict(fail=None, min_sv=min_sv, max_jump=max_jump, samples=np.array(samples), length=float(np.linalg.norm(p_end - p0)))

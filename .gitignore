@@ -21,3 +21,6 @@ runs/
 *.rspag
 *.tar
 .DS_Store
+
+# progress gallery is shared
+!progress/README.md
