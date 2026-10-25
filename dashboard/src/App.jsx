@@ -51,8 +51,10 @@ function reduceLive(s, e) {
     case "stage": return { ...s, stage: e.stage, status: e.status, approved: s.approved || e.status === "approved", [`stage_${e.stage}`]: { ...s[`stage_${e.stage}`], ...e } };
     case "iteration": {
       const base = { ...e, kind: k === 0 ? "single_pass" : "patch" };
-      if (k > 0 && e.decision) {
-        const d = e.decision;
+      const d = e.detail || (e.decision && typeof e.decision === "object" ? e.decision : null);
+      delete base.detail;
+      if (d) base.decision = d.decision;
+      if (k > 0 && d) {
         Object.assign(base, { argon_clip: d.clip_url, observations: d.observations, root_cause: d.root_cause, failure_time_s: d.failure_time_s,
           truth_t: d.truth_t, patch: { task: d.patch.task, routine: d.patch.routine }, diff: d.diff, changed_lines: d.changed_lines, scenario: d.scenario });
       }

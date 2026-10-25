@@ -60,7 +60,7 @@ class LiveRun:
             try:
                 dec = json.loads((d / "decision.json").read_text())
                 from loop.run_loop import routine_diff
-                e["decision"] = dict(dec, diff=routine_diff(dec.get("old_routine"), dec["patch"]["new_routine"]), clip_url=_url(d / dec["clip"]))
+                e["detail"] = dict(dec, diff=routine_diff(dec.get("old_routine"), dec["patch"]["new_routine"]), clip_url=_url(d / dec["clip"]))
             except Exception as ex:  # never let enrichment kill the stream
                 e["decision_error"] = str(ex)
         with self.cv:

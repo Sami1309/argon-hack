@@ -66,7 +66,7 @@ export default function Chart({ its, repeats = [], refs = [], current, onSelect,
           <div style={{ fontWeight: 650, marginBottom: 4 }}>Iteration {hv.iter} · {itLabel(hv)}</div>
           <div>Training <b>{pct(hv.cpr)}</b> · held-out <b>{pct(hv.heldout)}</b></div>
           {hv.progress != null && <div className="muted">normal-cycle progress {pct(hv.progress)}</div>}
-          {hv.decision && <div className="muted">{hv.decision}{hv.tried != null && hv.kept === false ? ` (tried ${pct(hv.tried)})` : ""}</div>}
+          {typeof hv.decision === "string" && <div className="muted">{hv.decision}{hv.tried != null && hv.kept === false ? ` (tried ${pct(hv.tried)})` : ""}</div>}
         </div>
       )}
     </div>
