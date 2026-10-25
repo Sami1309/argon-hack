@@ -1,0 +1,51 @@
+<mujoco model="crb15000_5_95">
+  <compiler angle="radian" meshdir="assets/crb15000_5_95"/>
+  <default><default class="robot"><geom rgba="0.92 0.92 0.90 1" contype="1" conaffinity="1" group="1"/></default></default>
+  <asset>
+    <mesh name="base_mesh" file="base.stl"/>
+    <mesh name="link1_mesh" file="link1.stl"/>
+    <mesh name="link2_mesh" file="link2.stl"/>
+    <mesh name="link3_mesh" file="link3.stl"/>
+    <mesh name="link4_mesh" file="link4.stl"/>
+    <mesh name="link5_mesh" file="link5.stl"/>
+    <mesh name="link6_mesh" file="link6.stl"/>
+  </asset>
+  <worldbody>
+    <body name="base">
+      <geom name="base_geom" type="mesh" mesh="base_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+      <body name="link1" pos="0 0 0.1855" quat="1 0 0 0">
+        <joint name="axis1_rotation" axis="0 0 1" range="-3.14159 3.14159"/>
+        <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+        <geom name="link1_geom" type="mesh" mesh="link1_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+        <body name="link2" pos="0 -0.085 0.0765" quat="1 0 0 0">
+          <joint name="axis2_arm" axis="0 1 0" range="-3.14159 3.14159"/>
+          <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+          <geom name="link2_geom" type="mesh" mesh="link2_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+          <body name="link3" pos="0 0 0.444" quat="1 0 0 0">
+            <joint name="axis3_arm" axis="0 1 0" range="-3.92699 1.48353"/>
+            <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+            <geom name="link3_geom" type="mesh" mesh="link3_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+            <body name="link4" pos="0.096 0.085 0.11" quat="0.707107 0 0.707107 0">
+              <joint name="axis4_wrist" axis="0 0 1" range="-3.14159 3.14159"/>
+              <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+              <geom name="link4_geom" type="mesh" mesh="link4_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+              <body name="link5" pos="0 0.0755 0.373" quat="1 0 0 0">
+                <joint name="axis5_bend" axis="0 1 0" range="-3.14159 3.14159"/>
+                <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+                <geom name="link5_geom" type="mesh" mesh="link5_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+                <body name="link6" pos="-0.08 -0.0745 0.068" quat="1 0 0 0">
+                  <joint name="axis6_turn" axis="0 0 1" range="-4.71239 4.71239"/>
+                  <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+                  <geom name="link6_geom" type="mesh" mesh="link6_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+                  <body name="tool_eef" pos="0 0 0.0326" quat="1 0 0 0">
+                    <site name="flange" size="0.006" rgba="0 0 1 1"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

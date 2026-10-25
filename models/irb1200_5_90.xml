@@ -1,0 +1,55 @@
+<mujoco model="irb1200_5_90">
+  <compiler angle="radian" meshdir="assets/irb1200_5_90"/>
+  <default><default class="robot"><geom rgba="0.93 0.55 0.10 1" contype="1" conaffinity="1" group="1"/></default></default>
+  <asset>
+    <mesh name="base_link_mesh" file="base_link.stl"/>
+    <mesh name="link_1_mesh" file="link_1.stl"/>
+    <mesh name="link_2_mesh" file="link_2.stl"/>
+    <mesh name="link_3_mesh" file="link_3.stl"/>
+    <mesh name="link_4_mesh" file="link_4.stl"/>
+    <mesh name="link_5_mesh" file="link_5.stl"/>
+    <mesh name="link_6_mesh" file="link_6.stl"/>
+  </asset>
+  <worldbody>
+    <body name="base_link">
+      <geom name="base_link_geom" type="mesh" mesh="base_link_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+      <body name="link_1" pos="0 0 0.3991" quat="1 0 0 0">
+        <joint name="joint_1" axis="0 0 1" range="-2.967 2.967"/>
+        <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+        <geom name="link_1_geom" type="mesh" mesh="link_1_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+        <body name="link_2" pos="0 0 0" quat="1 0 0 0">
+          <joint name="joint_2" axis="0 1 0" range="-1.745 2.269"/>
+          <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+          <geom name="link_2_geom" type="mesh" mesh="link_2_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+          <body name="link_3" pos="0 0 0.448" quat="1 0 0 0">
+            <joint name="joint_3" axis="0 1 0" range="-3.491 1.222"/>
+            <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+            <geom name="link_3_geom" type="mesh" mesh="link_3_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+            <body name="link_4" pos="0 0 0.042" quat="1 0 0 0">
+              <joint name="joint_4" axis="1 0 0" range="-4.712 4.712"/>
+              <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+              <geom name="link_4_geom" type="mesh" mesh="link_4_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+              <body name="link_5" pos="0.451 0 0" quat="1 0 0 0">
+                <joint name="joint_5" axis="0 1 0" range="-2.269 2.269"/>
+                <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+                <geom name="link_5_geom" type="mesh" mesh="link_5_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+                <body name="link_6" pos="0.082 0 0" quat="1 0 0 0">
+                  <joint name="joint_6" axis="1 0 0" range="-6.283 6.283"/>
+                  <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+                  <geom name="link_6_geom" type="mesh" mesh="link_6_mesh" pos="0 0 0" quat="1 0 0 0" class="robot"/>
+                  <body name="flange" pos="0 0 0" quat="1 0 0 0">
+                    <body name="tool0" pos="0 0 0" quat="0.707107 0 0.707107 0">
+                      <site name="flange" size="0.006" rgba="0 0 1 1"/>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="base" pos="0 0 0" quat="1 0 0 0">
+      </body>
+    </body>
+  </worldbody>
+</mujoco>
