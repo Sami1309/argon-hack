@@ -82,7 +82,8 @@ The engineer clicks **Approve**. Only then does the loop learn that `DI_GRIP_OK`
 Copying the code verbatim fails outright. The IRB controller had world base frames configured and the GoFa has none,
 so every target lands metres away (54/54 moves unreachable). Argon's single-pass port gets the geometry right, within
 0.5 mm of the engineer's port, and the normal cycle runs. Then the twin injects the failure Stage 1 found, and the
-port carries on without the tray.
+port carries on without the tray. To see the code itself, the [appendix](#appendix-the-same-routine-three-ways)
+puts one routine side by side: legacy, the engineer's port, and Argon's.
 
 | Copying the code | Argon's single pass, with one missed grasp |
 |---|---|
@@ -420,6 +421,84 @@ progress/     build log and every screenshot in this README
   and `jnogga/droid_failure` (CC BY 4.0). One lab scene, 218 episodes.
 - **Robot descriptions:** [PickNikRobotics/abb_ros2][abb-ros2] and [byeongkyu/abb_gofa_robot][gofa] (Apache-2.0).
 - **Built with:** Gemini 4 Argon (`gemini-4-argon`), Gemini Managed Agents, MuJoCo 3.17, `google-genai`.
+
+## Appendix: the same routine, three ways
+
+This shows how the port works, using one real routine: Robot 1 picks the tray off its table and puts it on the
+conveyor (`PROC PP_TAB_CONV`). Only the pick half is shown, because the place half follows the same pattern. `...`
+marks arguments cut for width, and `!` starts a comment.
+
+### 1. Legacy program (ABB IRB 1200)
+
+```
+CONST robtarget Target_TAB:=[[-3469.53,-3150.92,37.5],[0,-0.7071,0.7071,0],[0,0,0,0],...];
+
+PROC PP_TAB_CONV()
+    MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper\WObj:=wobj0;       ! move above the tray
+    MoveL Offs(Target_TAB,0,0,0), v100, fine, smc_gripper\WObj:=wobj0;  ! move down onto it
+    PulseDO DO_ATT_TAB;                                                 ! fire the gripper
+    WaitTime 0.25;                                                      ! wait a quarter second
+    MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper\WObj:=wobj0;       ! lift and carry on
+```
+
+- **Positions** are in factory-floor coordinates. That only works because the old controller was configured with where
+  each robot stands on the floor.
+- **The grip** fires, waits a quarter second and moves on. Nothing checks that the tray was picked up.
+
+### 2. The human engineer's port (ABB GoFa, held out, used only for scoring)
+
+```
+CONST robtarget Target_TAB:=[[149.017,611.162,36],[0,1,0,0],[0,0,-2,0],...];
+
+PROC PP_TAB_CONV()
+    MoveJ Offs(Target_TAB,0,0,200), ..., smc_gripper;
+    MoveL Offs(Target_TAB,0,0,0), v100, fine, smc_gripper;
+    PulseDO DO_ATT_TAB;
+    WaitTime 0.25;
+    MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper;
+```
+
+- **Positions:** every one is re-measured in the new robot's own coordinates, which is why the numbers are completely
+  different. The arm-posture settings are adjusted too, and the first move becomes a joint move (`MoveJ`).
+- **The grip is unchanged:** fire, wait, move on. When a grasp misses, this robot also carries on and "places" a tray
+  it isn't holding.
+
+### 3. Argon's port after the loop (ABB GoFa)
+
+```
+! converts the old factory-floor coordinates into this robot's coordinates
+TASK PERS wobjdata wobj_world:=[FALSE,TRUE,"",[[-3356.18,2943.42,0],[0.7071,0,0,-0.7071]],...];
+CONST robtarget Target_TAB:=[[-3469.53,-3150.92,37.5],[0,-0.7071,0.7071,0],[0,0,0,0],...];
+
+PROC PP_TAB_CONV()
+    MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper\WObj:=wobj_world;
+    MoveL Offs(Target_TAB,0,0,0), v100, fine, smc_gripper\WObj:=wobj_world;
+    PulseDO DO_ATT_TAB;
+    WaitTime 0.25;
+    IF DI_GRIP_OK = 0 THEN                          ! did we actually get it?
+        MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper\WObj:=wobj_world;     ! back off
+        MoveL Offs(Target_TAB,0,0,0), v100, fine, smc_gripper\WObj:=wobj_world; ! come back down
+        PulseDO DO_ATT_TAB;                         ! try once more
+        WaitTime 0.25;
+        IF DI_GRIP_OK = 0 THEN                      ! still nothing?
+            ErrWrite "R1 tray grasp failed", "DI_GRIP_OK=0 after retry";      ! raise an alarm
+            Stop;                                   ! stop safely instead of carrying on
+        ENDIF
+    ENDIF
+    MoveL Offs(Target_TAB,0,0,200), ..., smc_gripper\WObj:=wobj_world;
+```
+
+- **Positions:** Argon keeps the original numbers and adds one conversion (`wobj_world`) that tells the new robot
+  where the factory floor is relative to itself. Targets land within 0.4 mm of the engineer's port on average (1.3 mm at most).
+- **The grip** is checked with the sensor Argon proposed and the engineer approved. On a miss, the robot backs off and
+  tries once more. If that fails too, it raises an alarm and stops instead of shipping an empty box. The loop added
+  the same check at the other three grip points, one patch at a time.
+
+**Flagged in the migration report for a human to check:**
+- The conversion values declared at the top have the wrong sign. The loop's first patch corrects them when the
+  program starts (in `INIT_PARAM`), and the report asks for that correction to be moved into the declaration.
+- Argon switches off the arm-posture checks (`ConfJ \Off`) instead of setting new postures, as the engineer did. The
+  postures the controller picks should be verified on the first slow run.
 
 [ifr]: https://ifr.org/ifr-press-releases/five-million-robots-now-operate-in-factories-globally
 [abb-course]: https://app1.edoobox.com/en/ABBGB/OmniCore%20Controller%20Industrial%20robots/OmniCore%20Controller%20Industrial%20Robots/Course.ed.100f553f1c85_13045289173.Transition%20from%20IRC5%20to%20OmniCore
