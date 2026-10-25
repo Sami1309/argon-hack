@@ -3,7 +3,7 @@
 Every call writes <run_dir>/<label>.manifest.json: parts sent (kind, source, size, sha256), token usage by
 modality, latency. That manifest is the judges' proof of what went into each Argon call.
 """
-import hashlib, json, pathlib, re, sys, time
+import hashlib, json, pathlib, re, sys, threading, time
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import _env  # noqa: F401,E402
@@ -27,6 +27,7 @@ def _answer_key_literals():
 
 _LITERALS = _answer_key_literals() if _AK.exists() else set()
 _client = None
+_lock = threading.Lock()
 
 
 class QuarantineViolation(Exception):
@@ -35,7 +36,8 @@ class QuarantineViolation(Exception):
 
 def client():
     global _client
-    if _client is None: _client = genai.Client()
+    with _lock:  # one shared client: a second instance being garbage-collected closes in-flight requests
+        if _client is None: _client = genai.Client()
     return _client
 
 

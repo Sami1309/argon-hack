@@ -11,7 +11,7 @@ targets and the CAD bounding boxes; in Loop 1, Argon authors the real scene.
 | CP2: kinematic acid test | Legacy@IRB and human port@GoFa reach every target; verbatim copy@GoFa fails | ✅ |
 | CP3: interpreter + cell + scenario suite | Full two-robot cycle runs; missed grasp → silent failure; suite solvable to 100% | ✅ |
 | CP4: Argon port loop | single-pass port → critique of rendered failure → one patch → keep/revert; Cell Pass Rate climbs | ✅ 10% → 100% in 4 iterations |
-| CP5: prove the loop is *visual* | video-only critic (no overlay text, no trace) still diagnoses the failure | next |
+| CP5: prove the loop is *visual* | video-only critic (no overlay text, no trace) still diagnoses the failure | ✅ 8/8 |
 
 ## M0: what Argon can do (measured live, 2026-10-25)
 
@@ -159,3 +159,26 @@ controller would.
 
 **Caveat CP5 will address:** some of Argon's citations quote the burned-in event text, so the next check is a
 video-only critic (no overlay, no trace) to prove the diagnosis comes from the pixels.
+
+## CP5: is the critique really visual? (8 clips, pixels only)
+
+Argon got **only** an 8 s clip (no overlay text, no trace, no program) and one paragraph describing the cell. The
+clips are the 4 missed-grasp moments plus the same 4 grips succeeding, with randomized clip offsets.
+Script: `tests/cp5_video_only_critic.py`.
+
+![video only](img/cp5_video_only_citations.png)
+
+| clip | truth | Argon | correct | failure time true / Argon (s) | what Argon says happens next |
+|---|---|---|---|---|---|
+| `r1_tray_miss_once` | missed grasp | missed grasp | ✅ | 3.38 / 4.2 | The robot proceeds to move to the black conveyor as if it were holding the brown tray. |
+| `r1_tray_miss_once__control` | grasp ok | grasp ok | ✅ | — | Robot 1 successfully picks up the brown tray from the grey plate and places it onto the bl |
+| `r1_part_miss_once` | missed grasp | missed grasp | ✅ | 3.83 / 4.2 | The robot lifts away empty and continues its trajectory to the brown tray on the conveyor, |
+| `r1_part_miss_once__control` | grasp ok | grasp ok | ✅ | — |  |
+| `r2_tray_miss_once` | missed grasp | missed grasp | ✅ | 2.4 / 2.8 | Robot 2 continues its programmed motion to the cardboard box and then to the grey plate wi |
+| `r2_tray_miss_once__control` | grasp ok | grasp ok | ✅ | — | Robot 2 successfully grips the brown tray from the conveyor, places it into the cardboard  |
+| `r2_holder_miss_once` | missed grasp | missed grasp | ✅ | 1.52 / 1.6 | Robot 2 continues its motion to the cardboard box as if holding the grey plate and perform |
+| `r2_holder_miss_once__control` | grasp ok | grasp ok | ✅ | — | Not applicable - all picks in this clip succeed. |
+
+**8/8 correct**: no missed failures and no false alarms, at `thinking_level=low`. Argon's timestamps are the moment
+the robot visibly lifts away empty, 0.1–0.8 s after the grip command. In all four failures it also reports the
+defect the suite punishes: the robot carries on as if it were holding the part.
