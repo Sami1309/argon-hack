@@ -1,0 +1,46 @@
+{
+ "verbatim copy": {
+  "cpr": 0.0,
+  "nominal": false,
+  "fault_pass": "0/9",
+  "violations": 10,
+  "target_err": {
+   "mean_mm": 3546.1,
+   "max_mm": 5198.5,
+   "n": 8
+  }
+ },
+ "Argon single-pass": {
+  "cpr": 0.1,
+  "nominal": true,
+  "fault_pass": "0/9",
+  "violations": 10,
+  "target_err": {
+   "mean_mm": 0.4,
+   "max_mm": 1.3,
+   "n": 8
+  }
+ },
+ "Argon looped": {
+  "cpr": 1.0,
+  "nominal": true,
+  "fault_pass": "9/9",
+  "violations": 0,
+  "target_err": {
+   "mean_mm": 0.4,
+   "max_mm": 1.3,
+   "n": 8
+  }
+ },
+ "human port (held out)": {
+  "cpr": 0.1,
+  "nominal": true,
+  "fault_pass": "0/9",
+  "violations": 10,
+  "target_err": {
+   "mean_mm": 0.0,
+   "max_mm": 0.0,
+   "n": 8
+  }
+ }
+}

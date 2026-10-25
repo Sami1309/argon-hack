@@ -10,7 +10,8 @@ targets and the CAD bounding boxes; in Loop 1, Argon authors the real scene.
 | CP1: robot models | IRB 1200-5/0.9 and GoFa CRB 15000-5/0.95 reach match the datasheets (0.901 / 0.950 m) | ✅ |
 | CP2: kinematic acid test | Legacy@IRB and human port@GoFa reach every target; verbatim copy@GoFa fails | ✅ |
 | CP3: interpreter + cell + scenario suite | Full two-robot cycle runs; missed grasp → silent failure; suite solvable to 100% | ✅ |
-| CP4: first Argon loop iteration | critique → one patch → rerun → keep/revert, Cell Pass Rate moves | next |
+| CP4: Argon port loop | single-pass port → critique of rendered failure → one patch → keep/revert; Cell Pass Rate climbs | ✅ 10% → 100% in 4 iterations |
+| CP5: prove the loop is *visual* | video-only critic (no overlay text, no trace) still diagnoses the failure | next |
 
 ## M0: what Argon can do (measured live, 2026-10-25)
 
@@ -91,3 +92,70 @@ part. Fault injection and the `DI_GRIP_OK` sensor are simulation-only.
 **Known approximations:** zones run as fine points; confdata acceptance (±1 quadrant on axes 1/4/6) is calibrated
 on the two programs known to run; robot-vs-cell collisions aren't checked yet (the geometry is a placeholder);
 cycle times are approximate.
+
+## CP4: the Argon port loop (live API run)
+
+![loop chart](img/cp4_loop_cpr.png)
+
+Iteration 0 is Argon's **single-pass port** of both tasks (58 s, `thinking_level=medium`). It's a plain translation
+request using the cell facts, with the GoFa robots bolted onto the IRB mounting points, so nothing comes from the
+answer key. After that, each iteration runs the 10-scenario suite and renders the first failing scenario (8 s clip,
+5 fps). Argon gets the clip, the suite table, the twin trace and the current program, and returns **one routine**.
+A patch is kept only if the Cell Pass Rate rises (or stays level while violations fall). All 4 patches were kept;
+Argon calls took 11–28 s each.
+
+| iter | failing scenario shown | frame Argon cited | Argon's observation | patch | decision |
+|---|---|---|---|---|---|
+| 1 | `r1_tray_miss_once` | ![](img/cp4_iter01_evidence.png) | t=0.0s: R1 approaches the brown tray on the robotic table from above. | `R1.PP_TAB_CONV` | KEPT: CPR 10%->30%, violations 10->8 |
+| 2 | `r1_part_miss_once` | ![](img/cp4_iter02_evidence.png) | t=1.4s: R1 descends to the parts holder to pick red part AP3. | `R1.PP_TP_AB` | KEPT: CPR 30%->60%, violations 8->4 |
+| 3 | `r2_tray_miss_once` | ![](img/cp4_iter03_evidence.png) | t=2.0s: R2 reaches Target_TAB_CONV on the conveyor and pulses DO_SG_P and DO_ATT_TTAB, but the tray grasp fails (t=35.2s: T_R2 grip TRAY: FAILED). | `R2.PP_TAB_CONV` | KEPT: CPR 60%->80%, violations 4->2 |
+| 4 | `r2_holder_miss_once` | ![](img/cp4_iter04_evidence.png) | t=0.6s: R2 moves to the box holder (BH) pick position at Target_INIT_H. | `R2.PP_TAB_H` | KEPT: CPR 80%->100%, violations 2->0 |
+
+Patch from iteration 1, exactly as Argon wrote it (grip check, one re-approach, then a safe stop with an alarm):
+
+```
+PROC PP_TAB_CONV()
+    MoveL Offs(Target_TAB,0,0,200),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+    MoveL Offs(Target_TAB,0,0,0),v100,fine,smc_gripper\WObj:=wobj0;
+    PulseDO DO_ATT_TAB;
+    WaitTime 0.25;
+    IF DI_GRIP_OK = 0 THEN
+        MoveL Offs(Target_TAB,0,0,200),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+        MoveL Offs(Target_TAB,0,0,0),v100,fine,smc_gripper\WObj:=wobj0;
+        PulseDO DO_ATT_TAB;
+        WaitTime 0.25;
+    ENDIF
+    IF DI_GRIP_OK = 0 THEN
+        MoveL Offs(Target_TAB,0,0,200),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+        ErrWrite "R1 tray grip failed","DI_GRIP_OK=0 after retry";
+        Stop;
+        EXIT;
+    ENDIF
+    MoveL Offs(Target_TAB,0,0,200),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+    MoveJ Offs(Target_TAB_CONV,0,0,100),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+    MoveL Offs(Target_TAB_CONV,0,0,0),v100,fine,smc_gripper\WObj:=wobj0;
+    PulseDO DO_DET_TAB;
+    WaitTime 0.25;
+    MoveL Offs(Target_TAB_CONV,0,0,100),r_str.r_param.speed,r_str.r_param.zone,smc_gripper\WObj:=wobj0;
+ENDPROC
+```
+
+### Held-out scoreboard (every cell computed by `loop/score.py` from real runs)
+
+| | verbatim copy | Argon single-pass | Argon looped | human port (held out) |
+|---|---|---|---|---|
+| Cell Pass Rate | **0%** | **10%** | **100%** | **10%** |
+| Nominal cycle delivered | ❌ | ✅ | ✅ | ✅ |
+| Fault scenarios passed | 0/9 | 0/9 | 9/9 | 0/9 |
+| Violations (whole suite) | 10 | 10 | 0 | 10 |
+| Target error vs human port (world frame, mean/max mm) | 3546.1 / 5198.5 | 0.4 / 1.3 | 0.4 / 1.3 | — |
+
+The human port is used only here, for scoring. Our GoFas sit on the IRB mounts while the human placed theirs about
+100 mm away, so target error is compared in world coordinates.
+
+**Twin fix made during CP4:** the single-pass port used `ConfJ \Off` / `ConfL \Off`, and the interpreter had been
+ignoring those instructions. It now honors them (confdata is ignored and the nearest solution wins), as a real
+controller would.
+
+**Caveat CP5 will address:** some of Argon's citations quote the burned-in event text, so the next check is a
+video-only critic (no overlay, no trace) to prove the diagnosis comes from the pixels.

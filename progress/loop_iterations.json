@@ -1,0 +1,54 @@
+[
+ {
+  "iter": "iter01",
+  "scenario": "r1_tray_miss_once",
+  "decision": "KEPT",
+  "reason": "CPR 10%->30%, violations 10->8",
+  "patch": "R1.PP_TAB_CONV",
+  "cited": {
+   "clip_time_s": 0.0,
+   "what": "R1 approaches the brown tray on the robotic table from above."
+  },
+  "root_cause": "R1's PP_TAB_CONV routine grips the tray open-loop (PulseDO DO_ATT_TAB followed only by WaitTime 0.25) without checking DI_GRIP_OK. When a grasp fails, the robot continues the place trajectory and commands DO_DET_TAB while holding nothing.",
+  "image": "img/cp4_iter01_evidence.png"
+ },
+ {
+  "iter": "iter02",
+  "scenario": "r1_part_miss_once",
+  "decision": "KEPT",
+  "reason": "CPR 30%->60%, violations 8->4",
+  "patch": "R1.PP_TP_AB",
+  "cited": {
+   "clip_time_s": 1.4,
+   "what": "R1 descends to the parts holder to pick red part AP3."
+  },
+  "root_cause": "R1 routine PP_TP_AB performs an open-loop pick (OBJECT_MANIP attach + WaitTime 0.25) without checking DI_GRIP_OK, so when a part pick misses or the part is displaced, R1 proceeds to the place trajectory and commands detach on an empty gripper.",
+  "image": "img/cp4_iter02_evidence.png"
+ },
+ {
+  "iter": "iter03",
+  "scenario": "r2_tray_miss_once",
+  "decision": "KEPT",
+  "reason": "CPR 60%->80%, violations 4->2",
+  "patch": "R2.PP_TAB_CONV",
+  "cited": {
+   "clip_time_s": 2.0,
+   "what": "R2 reaches Target_TAB_CONV on the conveyor and pulses DO_SG_P and DO_ATT_TTAB, but the tray grasp fails (t=35.2s: T_R2 grip TRAY: FAILED)."
+  },
+  "root_cause": "R2 routine PP_TAB_CONV executes an open-loop grasp (PulseDO DO_SG_P and DO_ATT_TTAB followed by WaitTime 0.25) without checking DI_GRIP_OK to verify that the tray is held before moving to the box and detaching.",
+  "image": "img/cp4_iter03_evidence.png"
+ },
+ {
+  "iter": "iter04",
+  "scenario": "r2_holder_miss_once",
+  "decision": "KEPT",
+  "reason": "CPR 80%->100%, violations 2->0",
+  "patch": "R2.PP_TAB_H",
+  "cited": {
+   "clip_time_s": 0.6,
+   "what": "R2 moves to the box holder (BH) pick position at Target_INIT_H."
+  },
+  "root_cause": "R2's PP_TAB_H routine pulses DO_ATT_BH to vacuum-grip the box holder open-loop without checking DI_GRIP_OK, so when the grasp misses it continues to the place target and commands DO_DET_BH on an empty gripper.",
+  "image": "img/cp4_iter04_evidence.png"
+ }
+]

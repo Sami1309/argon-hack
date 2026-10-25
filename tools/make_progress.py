@@ -84,3 +84,30 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def loop_gallery(run_dir):
+    """Chart + one evidence tile per iteration (the frame Argon cited, its patch target and the decision)."""
+    from tools.plot_loop import plot
+    run_dir = pathlib.Path(run_dir)
+    plot(run_dir, OUT / "cp4_loop_cpr.png")
+    rows = []
+    for d in sorted(run_dir.glob("iter[0-9][0-9]")):
+        dec = d / "decision.json"
+        if not dec.exists(): continue
+        j = json.loads(dec.read_text())
+        clip = next(d.glob("*.mp4"), None)
+        obs = j["observations"][0] if j["observations"] else {"clip_time_s": 0, "what": ""}
+        if clip:
+            frames = imageio.mimread(clip, memtest=False)
+            k = min(len(frames) - 1, max(0, int(round(obs["clip_time_s"] * 5))))
+            img = Image.fromarray(frames[k]); img.thumbnail((480, 270))
+            p = OUT / f"cp4_{d.name}_evidence.png"; img.save(p, optimize=True)
+        rows.append(dict(iter=d.name, scenario=j["scenario"], decision=j["decision"], reason=j["reason"],
+                         patch=f"{j['patch']['task']}.{j['patch']['routine']}", cited=obs, root_cause=j["root_cause"],
+                         image=f"img/cp4_{d.name}_evidence.png" if clip else None))
+    (OUT.parent / "loop_iterations.json").write_text(json.dumps(rows, indent=1))
+    return rows
+
+
+import imageio  # noqa: E402  (used by loop_gallery)

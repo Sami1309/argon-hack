@@ -44,6 +44,7 @@ class Rig:
     fingers_closed: bool = False
     failed_attach: bool = False
     tool_key: tuple = None
+    conf_check: dict = field(default_factory=lambda: {"ConfJ": True, "ConfL": True})
 
 
 @dataclass
@@ -159,7 +160,10 @@ class World:
             self.log(task, "alarm" if name != "TPWrite" else "message", text=" | ".join(str(a) for a in args), line=line)
         elif name == "BookErrNo":
             task.next_errno += 1; args[0].set(float(task.next_errno))
-        elif name in ("ConfJ", "ConfL", "SingArea", "AccSet", "VelSet", "StopMove", "StartMove", "ClearPath", "TPErase"):
+        elif name in ("ConfJ", "ConfL"):  # configuration monitoring: \Off = ignore confdata, take the nearest solution
+            rig.conf_check[name] = "Off" not in opts
+            self.log(task, "setting", name=name, value="On" if rig.conf_check[name] else "Off", line=line)
+        elif name in ("SingArea", "AccSet", "VelSet", "StopMove", "StartMove", "ClearPath", "TPErase"):
             self.log(task, "setting", name=name, opts=list(opts), line=line)
         else:
             self.log(task, "violation", type="rapid_error", detail=f"unsupported instruction {name}", line=line)
@@ -188,6 +192,7 @@ class World:
                 self.log(task, "violation", type="unreachable", target=tgt_world, line=line)
                 raise TaskStop("unreachable target")
             confs = [rob.confdata(s) for s in sols]
+            if not rig.conf_check["ConfJ"]: confs = [conf] * len(sols)  # ConfJ\Off: any solution, nearest wins
             exact = [s for s, c in zip(sols, confs) if c == conf]
             ok = [s for s, c in zip(sols, confs) if Robot.conf_ok(c, conf)]
             if not (exact or ok):
@@ -205,7 +210,7 @@ class World:
             if travel.max() > 180:
                 self.log(task, "violation", type="axis_travel", travel_deg=travel.round(1).tolist(), line=line)
             reached = rob.confdata(q_end)
-            if not Robot.conf_ok(reached, conf):
+            if rig.conf_check["ConfL"] and not Robot.conf_ok(reached, conf):
                 self.log(task, "violation", type="config_mismatch", programmed=list(conf), reached=list(reached), line=line)
                 raise TaskStop("configuration mismatch at end of linear move")
             vmax = JOINT_VMAX[rig.model]

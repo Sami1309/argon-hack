@@ -36,3 +36,32 @@ def fit_base(robot):
 
 def human_port_bases():
     return {r: fit_base(r)[:2] for r in ("R1", "R2")}
+
+
+def world_targets(module_src, base_pos, base_quat, wobj0_is_world=False):
+    from simulation.kinematics import quat_to_mat
+    R = quat_to_mat(base_quat)
+    return {m[1]: (np.array([float(x) for x in m[2].split(",")]) if wobj0_is_world else
+                   base_pos + R @ np.array([float(x) for x in m[2].split(",")])) for m in _RT.finditer(module_src)}
+
+
+def target_error_vs_human(prog, rigs):
+    """Per-target world-frame distance (mm) between a program's robtargets and the human port's, both via their own bases."""
+    hb = human_port_bases(); hp = human_port_programs()
+    errs = []
+    for r in ("R1", "R2"):
+        mine = world_targets(prog[r][1], rigs[r].base_pos, rigs[r].base_quat, rigs[r].wobj0_is_world)
+        theirs = world_targets(hp[r][1], hb[r][0], hb[r][1])
+        errs += [float(np.linalg.norm(mine[n] - theirs[n])) for n in theirs if n in mine and n != "Target_HOME"]
+    return dict(mean_mm=round(float(np.mean(errs)), 1), max_mm=round(float(np.max(errs)), 1), n=len(errs))
+
+
+def scoreboard(columns):
+    """columns: {name: (programs, rigs_fn)} -> rows computed by code from real runs."""
+    from simulation.scenarios import run_suite
+    out = {}
+    for name, (prog, rigs_fn) in columns.items():
+        s = run_suite(prog, rigs_fn, verbose=False)
+        out[name] = dict(cpr=s["cpr"], nominal=bool(s["nominal"][0]), fault_pass=f"{s['fault_pass']}/9", violations=s["violations"],
+                         target_err=target_error_vs_human(prog, rigs_fn()))
+    return out
