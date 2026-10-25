@@ -1,0 +1,1955 @@
+{
+ "source": {
+  "file": "runs/smoke/unified_1m.json",
+  "latency_s": 121.0,
+  "prompt_tokens": 755591,
+  "tokens_by_modality": {
+   "TEXT": 499691,
+   "VIDEO": 255900
+  },
+  "inputs": [
+   "shift_v2.mp4 (18:57, 218 episodes, 3 fps)",
+   "telemetry 5 Hz, all 218 episodes",
+   "legacy RAPID + PLC code (IRB 1200 cell)"
+  ]
+ },
+ "video_only": {
+  "file": "runs/smoke/shift_fps3_low_medium.json",
+  "latency_s": 82.3,
+  "prompt_tokens": 262997,
+  "flagged": 19
+ },
+ "flags": [
+  {
+   "t": 34.0,
+   "seg": 5,
+   "type": "missed_grasp",
+   "evidence": "seg 5: gripper closes to 0.94 at (0.611, 0.280, 0.164) \u2014 fingers close on empty air above the green block; arm retracts without transporting the block to the bowl.",
+   "gripper_peak": 0.94
+  },
+  {
+   "t": 65.0,
+   "seg": 10,
+   "type": "missed_grasp",
+   "evidence": "seg 10: gripper closes to 0.97 at z=0.192 while lifting away from the block; block remains on the table.",
+   "gripper_peak": 0.97
+  },
+  {
+   "t": 91.0,
+   "seg": 15,
+   "type": "missed_grasp",
+   "evidence": "seg 15: gripper closes to 0.96 at (0.497, 0.219, 0.138); block slips/missed and stays on table while arm aborts.",
+   "gripper_peak": 0.96
+  },
+  {
+   "t": 250.0,
+   "seg": 46,
+   "type": "missed_grasp_with_re_grasp",
+   "evidence": "seg 46: first closure reaches 0.88 at t=251.13s (missed grasp), then operator re-opens (0.00 at 252.13s) and re-grasps at t=253.13s (gripper=0.52) to complete the place.",
+   "gripper_peak": 0.88
+  },
+  {
+   "t": 272.0,
+   "seg": 50,
+   "type": "missed_grasp",
+   "evidence": "seg 50: gripper closes to 0.92 at z=0.207; fingers close empty, block left on table.",
+   "gripper_peak": 0.92
+  },
+  {
+   "t": 313.0,
+   "seg": 59,
+   "type": "camera_blackout",
+   "evidence": "seg 59 (05:13-05:16): video feed goes completely black for ~3s; telemetry shows arm stationary at (0.386, 0.098, 0.373) with gripper=0.00.",
+   "gripper_peak": 0.0
+  },
+  {
+   "t": 335.0,
+   "seg": 63,
+   "type": "missed_grasp",
+   "evidence": "seg 63: gripper closes to 0.90 at (0.501, 0.303, 0.152) missing the block; arm lifts empty.",
+   "gripper_peak": 0.9
+  },
+  {
+   "t": 443.0,
+   "seg": 82,
+   "type": "Bowl_collision_tip",
+   "evidence": "seg 82: telemetry shows normal grasp (0.58) and release, but video at 07:23 shows the gripper striking the rim of the black bowl and tipping/ tilting it.",
+   "gripper_peak": 0.58
+  },
+  {
+   "t": 489.0,
+   "seg": 92,
+   "type": "failed_release_drop_outside",
+   "evidence": "seg 92: robot grasps block (0.54 at 492.40s), moves over bowl, opens gripper at 494.20s, but sweeps back toward table carrying/knocking the block onto the table at (0.380, -0.032, 0.263).",
+   "gripper_peak": 0.54
+  },
+  {
+   "t": 502.0,
+   "seg": 94,
+   "type": "dropped_outside_bowl",
+   "evidence": "seg 94: gripper holds block (0.47 from 503.33s to 505.33s) and never opens before segment cut; video shows block knocked/dropped beside the bowl instead of inside.",
+   "gripper_peak": 0.47
+  },
+  {
+   "t": 589.0,
+   "seg": 108,
+   "type": "missed_grasp",
+   "evidence": "seg 108: gripper closes to 0.93 at (0.660, -0.342, 0.149); misses block on far right of table.",
+   "gripper_peak": 0.93
+  },
+  {
+   "t": 781.0,
+   "seg": 146,
+   "type": "missed_grasp",
+   "evidence": "seg 146: gripper closes to 0.93 at (0.452, -0.261, 0.146); fingers close on nothing, episode ends without place.",
+   "gripper_peak": 0.93
+  },
+  {
+   "t": 791.0,
+   "seg": 148,
+   "type": "aborted_episode_no_grasp",
+   "evidence": "seg 148: arm hovers near block for ~10s, twitches gripper to 0.21 at 792.73s then 0.00 through 795.93s without grasping.",
+   "gripper_peak": 0.21
+  },
+  {
+   "t": 800.0,
+   "seg": 149,
+   "type": "missed_grasp",
+   "evidence": "seg 149: gripper closes fully to 0.99 at (0.640, -0.161, 0.175); completely misses green block.",
+   "gripper_peak": 0.99
+  },
+  {
+   "t": 877.0,
+   "seg": 165,
+   "type": "missed_grasp",
+   "evidence": "seg 165: gripper closes to 0.99 at (0.666, -0.098, 0.137); misses block and lifts empty.",
+   "gripper_peak": 0.99
+  },
+  {
+   "t": 920.0,
+   "seg": 174,
+   "type": "missed_grasp",
+   "evidence": "seg 174: video at 15:20 shows gripper missing/pushing the block and rising empty to the bowl, whereas telemetry reports gripper=0.51 (typical object-held width) from 920.27s to 921.07s.",
+   "gripper_peak": 0.51
+  },
+  {
+   "t": 956.0,
+   "seg": 181,
+   "type": "missed_grasp",
+   "evidence": "seg 181: gripper closes to 0.93 at (0.431, -0.246, 0.148); misses block and aborts.",
+   "gripper_peak": 0.93
+  },
+  {
+   "t": 966.0,
+   "seg": 183,
+   "type": "missed_grasp",
+   "evidence": "seg 183: gripper closes to 0.91 at (0.476, -0.141, 0.139); misses block and lifts empty.",
+   "gripper_peak": 0.91
+  },
+  {
+   "t": 1028.0,
+   "seg": 195,
+   "type": "aborted_episode_no_grasp",
+   "evidence": "seg 195: arm approaches table (z=0.272 at 1028.07s) with gripper=0.00 throughout and resets before grasping.",
+   "gripper_peak": 0.0
+  }
+ ],
+ "episodes": [
+  {
+   "seg": 0,
+   "t0": 0.0,
+   "t1": 7.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 1,
+   "t0": 7.13,
+   "t1": 14.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 2,
+   "t0": 14.47,
+   "t1": 20.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 3,
+   "t0": 20.6,
+   "t1": 25.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 4,
+   "t0": 25.8,
+   "t1": 31.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 5,
+   "t0": 31.93,
+   "t1": 37.93,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 6,
+   "t0": 37.93,
+   "t1": 47.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 7,
+   "t0": 47.07,
+   "t1": 52.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 8,
+   "t0": 52.27,
+   "t1": 58.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 9,
+   "t0": 58.13,
+   "t1": 63.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 10,
+   "t0": 63.13,
+   "t1": 67.93,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 11,
+   "t0": 67.93,
+   "t1": 73.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 12,
+   "t0": 73.27,
+   "t1": 78.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 13,
+   "t0": 78.8,
+   "t1": 83.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 14,
+   "t0": 83.67,
+   "t1": 88.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 15,
+   "t0": 88.8,
+   "t1": 93.4,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 16,
+   "t0": 93.4,
+   "t1": 98.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 17,
+   "t0": 98.67,
+   "t1": 104.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 18,
+   "t0": 104.4,
+   "t1": 109.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 19,
+   "t0": 109.93,
+   "t1": 115.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 20,
+   "t0": 115.4,
+   "t1": 120.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 21,
+   "t0": 120.87,
+   "t1": 126.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 22,
+   "t0": 126.07,
+   "t1": 131.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 23,
+   "t0": 131.73,
+   "t1": 136.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 24,
+   "t0": 136.73,
+   "t1": 141.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 25,
+   "t0": 141.73,
+   "t1": 147.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 26,
+   "t0": 147.0,
+   "t1": 152.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 27,
+   "t0": 152.4,
+   "t1": 156.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 28,
+   "t0": 156.87,
+   "t1": 161.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 29,
+   "t0": 161.87,
+   "t1": 166.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 30,
+   "t0": 166.53,
+   "t1": 171.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 31,
+   "t0": 171.0,
+   "t1": 175.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 32,
+   "t0": 175.47,
+   "t1": 180.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 33,
+   "t0": 180.13,
+   "t1": 184.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 34,
+   "t0": 184.87,
+   "t1": 190.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 35,
+   "t0": 190.27,
+   "t1": 195.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 36,
+   "t0": 195.33,
+   "t1": 202.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 37,
+   "t0": 202.0,
+   "t1": 207.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 38,
+   "t0": 207.0,
+   "t1": 213.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 39,
+   "t0": 213.53,
+   "t1": 217.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 40,
+   "t0": 217.6,
+   "t1": 222.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 41,
+   "t0": 222.33,
+   "t1": 227.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 42,
+   "t0": 227.8,
+   "t1": 232.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 43,
+   "t0": 232.87,
+   "t1": 237.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 44,
+   "t0": 237.67,
+   "t1": 242.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 45,
+   "t0": 242.07,
+   "t1": 246.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 46,
+   "t0": 246.93,
+   "t1": 255.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": "missed_grasp_with_re_grasp"
+  },
+  {
+   "seg": 47,
+   "t0": 255.07,
+   "t1": 260.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 48,
+   "t0": 260.47,
+   "t1": 265.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 49,
+   "t0": 265.33,
+   "t1": 269.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 50,
+   "t0": 269.87,
+   "t1": 273.67,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 51,
+   "t0": 273.67,
+   "t1": 279.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 52,
+   "t0": 279.67,
+   "t1": 284.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 53,
+   "t0": 284.47,
+   "t1": 291.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 54,
+   "t0": 291.2,
+   "t1": 296.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 55,
+   "t0": 296.27,
+   "t1": 300.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 56,
+   "t0": 300.87,
+   "t1": 305.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 57,
+   "t0": 305.0,
+   "t1": 309.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 58,
+   "t0": 309.67,
+   "t1": 313.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 59,
+   "t0": 313.87,
+   "t1": 316.93,
+   "dataset_kind": "failure",
+   "label": "incomplete_attempt_cause_unknown",
+   "argon": "camera_blackout"
+  },
+  {
+   "seg": 60,
+   "t0": 316.93,
+   "t1": 322.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 61,
+   "t0": 322.6,
+   "t1": 327.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 62,
+   "t0": 327.33,
+   "t1": 333.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 63,
+   "t0": 333.2,
+   "t1": 338.07,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 64,
+   "t0": 338.07,
+   "t1": 343.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 65,
+   "t0": 343.53,
+   "t1": 349.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 66,
+   "t0": 349.33,
+   "t1": 354.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 67,
+   "t0": 354.0,
+   "t1": 360.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 68,
+   "t0": 360.73,
+   "t1": 366.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 69,
+   "t0": 366.13,
+   "t1": 372.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 70,
+   "t0": 372.4,
+   "t1": 377.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 71,
+   "t0": 377.33,
+   "t1": 382.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 72,
+   "t0": 382.6,
+   "t1": 387.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 73,
+   "t0": 387.53,
+   "t1": 393.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 74,
+   "t0": 393.67,
+   "t1": 399.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 75,
+   "t0": 399.53,
+   "t1": 405.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 76,
+   "t0": 405.07,
+   "t1": 410.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 77,
+   "t0": 410.6,
+   "t1": 416.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 78,
+   "t0": 416.27,
+   "t1": 421.53,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": null
+  },
+  {
+   "seg": 79,
+   "t0": 421.53,
+   "t1": 427.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 80,
+   "t0": 427.4,
+   "t1": 434.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 81,
+   "t0": 434.13,
+   "t1": 438.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 82,
+   "t0": 438.6,
+   "t1": 443.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": "Bowl_collision_tip"
+  },
+  {
+   "seg": 83,
+   "t0": 443.07,
+   "t1": 447.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 84,
+   "t0": 447.87,
+   "t1": 452.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 85,
+   "t0": 452.2,
+   "t1": 457.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 86,
+   "t0": 457.13,
+   "t1": 462.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 87,
+   "t0": 462.93,
+   "t1": 467.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 88,
+   "t0": 467.67,
+   "t1": 473.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 89,
+   "t0": 473.53,
+   "t1": 480.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 90,
+   "t0": 480.27,
+   "t1": 485.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 91,
+   "t0": 485.13,
+   "t1": 489.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 92,
+   "t0": 489.2,
+   "t1": 495.27,
+   "dataset_kind": "failure",
+   "label": "no_visible_failure_source_label_discrepancy",
+   "argon": "failed_release_drop_outside"
+  },
+  {
+   "seg": 93,
+   "t0": 495.27,
+   "t1": 499.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 94,
+   "t0": 499.73,
+   "t1": 505.53,
+   "dataset_kind": "failure",
+   "label": "contact_displacement",
+   "argon": "dropped_outside_bowl"
+  },
+  {
+   "seg": 95,
+   "t0": 505.53,
+   "t1": 511.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 96,
+   "t0": 511.67,
+   "t1": 516.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 97,
+   "t0": 516.4,
+   "t1": 524.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 98,
+   "t0": 524.33,
+   "t1": 529.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 99,
+   "t0": 529.0,
+   "t1": 535.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 100,
+   "t0": 535.73,
+   "t1": 541.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 101,
+   "t0": 541.8,
+   "t1": 546.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 102,
+   "t0": 546.0,
+   "t1": 550.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 103,
+   "t0": 550.13,
+   "t1": 556.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 104,
+   "t0": 556.93,
+   "t1": 561.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 105,
+   "t0": 561.73,
+   "t1": 568.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 106,
+   "t0": 568.13,
+   "t1": 576.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 107,
+   "t0": 576.13,
+   "t1": 581.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 108,
+   "t0": 581.6,
+   "t1": 590.47,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 109,
+   "t0": 590.47,
+   "t1": 598.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 110,
+   "t0": 598.0,
+   "t1": 603.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 111,
+   "t0": 603.33,
+   "t1": 609.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 112,
+   "t0": 609.07,
+   "t1": 615.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 113,
+   "t0": 615.47,
+   "t1": 620.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 114,
+   "t0": 620.33,
+   "t1": 625.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 115,
+   "t0": 625.6,
+   "t1": 631.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 116,
+   "t0": 631.53,
+   "t1": 635.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 117,
+   "t0": 635.73,
+   "t1": 641.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 118,
+   "t0": 641.33,
+   "t1": 646.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 119,
+   "t0": 646.4,
+   "t1": 650.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 120,
+   "t0": 650.6,
+   "t1": 655.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 121,
+   "t0": 655.93,
+   "t1": 660.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 122,
+   "t0": 660.4,
+   "t1": 665.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 123,
+   "t0": 665.53,
+   "t1": 670.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 124,
+   "t0": 670.47,
+   "t1": 675.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 125,
+   "t0": 675.33,
+   "t1": 679.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 126,
+   "t0": 679.73,
+   "t1": 684.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 127,
+   "t0": 684.47,
+   "t1": 689.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 128,
+   "t0": 689.53,
+   "t1": 696.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 129,
+   "t0": 696.53,
+   "t1": 700.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 130,
+   "t0": 700.87,
+   "t1": 706.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 131,
+   "t0": 706.33,
+   "t1": 710.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 132,
+   "t0": 710.47,
+   "t1": 715.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 133,
+   "t0": 715.53,
+   "t1": 721.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 134,
+   "t0": 721.2,
+   "t1": 726.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 135,
+   "t0": 726.93,
+   "t1": 730.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 136,
+   "t0": 730.8,
+   "t1": 735.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 137,
+   "t0": 735.0,
+   "t1": 740.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 138,
+   "t0": 740.53,
+   "t1": 744.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 139,
+   "t0": 744.73,
+   "t1": 750.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 140,
+   "t0": 750.47,
+   "t1": 755.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 141,
+   "t0": 755.53,
+   "t1": 760.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 142,
+   "t0": 760.27,
+   "t1": 764.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 143,
+   "t0": 764.47,
+   "t1": 768.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 144,
+   "t0": 768.87,
+   "t1": 772.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 145,
+   "t0": 772.67,
+   "t1": 778.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 146,
+   "t0": 778.07,
+   "t1": 781.8,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 147,
+   "t0": 781.8,
+   "t1": 785.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 148,
+   "t0": 785.93,
+   "t1": 796.07,
+   "dataset_kind": "failure",
+   "label": "contact_displacement",
+   "argon": "aborted_episode_no_grasp"
+  },
+  {
+   "seg": 149,
+   "t0": 796.07,
+   "t1": 801.2,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 150,
+   "t0": 801.2,
+   "t1": 806.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 151,
+   "t0": 806.73,
+   "t1": 810.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 152,
+   "t0": 810.93,
+   "t1": 815.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 153,
+   "t0": 815.67,
+   "t1": 822.13,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": null
+  },
+  {
+   "seg": 154,
+   "t0": 822.13,
+   "t1": 826.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 155,
+   "t0": 826.2,
+   "t1": 831.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 156,
+   "t0": 831.4,
+   "t1": 835.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 157,
+   "t0": 835.87,
+   "t1": 840.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 158,
+   "t0": 840.6,
+   "t1": 845.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 159,
+   "t0": 845.8,
+   "t1": 850.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 160,
+   "t0": 850.07,
+   "t1": 854.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 161,
+   "t0": 854.13,
+   "t1": 858.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 162,
+   "t0": 858.53,
+   "t1": 863.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 163,
+   "t0": 863.07,
+   "t1": 868.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 164,
+   "t0": 868.67,
+   "t1": 873.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 165,
+   "t0": 873.27,
+   "t1": 878.0,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 166,
+   "t0": 878.0,
+   "t1": 882.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 167,
+   "t0": 882.6,
+   "t1": 886.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 168,
+   "t0": 886.4,
+   "t1": 891.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 169,
+   "t0": 891.53,
+   "t1": 896.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 170,
+   "t0": 896.27,
+   "t1": 900.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 171,
+   "t0": 900.27,
+   "t1": 908.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 172,
+   "t0": 908.67,
+   "t1": 912.67,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 173,
+   "t0": 912.67,
+   "t1": 917.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 174,
+   "t0": 917.87,
+   "t1": 921.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 175,
+   "t0": 921.4,
+   "t1": 926.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 176,
+   "t0": 926.2,
+   "t1": 930.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 177,
+   "t0": 930.07,
+   "t1": 937.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 178,
+   "t0": 937.47,
+   "t1": 942.2,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 179,
+   "t0": 942.2,
+   "t1": 947.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 180,
+   "t0": 947.47,
+   "t1": 951.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 181,
+   "t0": 951.8,
+   "t1": 957.27,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 182,
+   "t0": 957.27,
+   "t1": 962.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 183,
+   "t0": 962.73,
+   "t1": 967.6,
+   "dataset_kind": "failure",
+   "label": "missed_grasp",
+   "argon": "missed_grasp"
+  },
+  {
+   "seg": 184,
+   "t0": 967.6,
+   "t1": 972.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 185,
+   "t0": 972.73,
+   "t1": 978.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 186,
+   "t0": 978.0,
+   "t1": 989.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 187,
+   "t0": 989.47,
+   "t1": 995.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 188,
+   "t0": 995.93,
+   "t1": 999.4,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 189,
+   "t0": 999.4,
+   "t1": 1003.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 190,
+   "t0": 1003.53,
+   "t1": 1008.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 191,
+   "t0": 1008.8,
+   "t1": 1012.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 192,
+   "t0": 1012.8,
+   "t1": 1017.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 193,
+   "t0": 1017.27,
+   "t1": 1021.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 194,
+   "t0": 1021.27,
+   "t1": 1025.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 195,
+   "t0": 1025.27,
+   "t1": 1028.2,
+   "dataset_kind": "failure",
+   "label": "incomplete_attempt_cause_unknown",
+   "argon": "aborted_episode_no_grasp"
+  },
+  {
+   "seg": 196,
+   "t0": 1028.2,
+   "t1": 1034.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 197,
+   "t0": 1034.33,
+   "t1": 1040.0,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 198,
+   "t0": 1040.0,
+   "t1": 1046.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 199,
+   "t0": 1046.27,
+   "t1": 1053.33,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 200,
+   "t0": 1053.33,
+   "t1": 1058.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 201,
+   "t0": 1058.27,
+   "t1": 1064.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 202,
+   "t0": 1064.13,
+   "t1": 1068.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 203,
+   "t0": 1068.93,
+   "t1": 1074.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 204,
+   "t0": 1074.47,
+   "t1": 1078.6,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 205,
+   "t0": 1078.6,
+   "t1": 1084.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 206,
+   "t0": 1084.73,
+   "t1": 1090.13,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 207,
+   "t0": 1090.13,
+   "t1": 1094.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 208,
+   "t0": 1094.27,
+   "t1": 1098.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 209,
+   "t0": 1098.73,
+   "t1": 1103.73,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 210,
+   "t0": 1103.73,
+   "t1": 1107.93,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 211,
+   "t0": 1107.93,
+   "t1": 1112.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 212,
+   "t0": 1112.27,
+   "t1": 1115.8,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 213,
+   "t0": 1115.8,
+   "t1": 1120.07,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 214,
+   "t0": 1120.07,
+   "t1": 1123.87,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 215,
+   "t0": 1123.87,
+   "t1": 1128.27,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 216,
+   "t0": 1128.27,
+   "t1": 1132.53,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  },
+  {
+   "seg": 217,
+   "t0": 1132.53,
+   "t1": 1137.47,
+   "dataset_kind": "success",
+   "label": "success",
+   "argon": null
+  }
+ ],
+ "agreement": {
+  "argon_flagged": 18,
+  "dataset_failures": 17,
+  "both": 14,
+  "argon_only": [
+   46,
+   82,
+   92,
+   174
+  ],
+  "dataset_only": [
+   59,
+   78,
+   153
+  ]
+ },
+ "counts": {
+  "Bowl_collision_tip": 1,
+  "aborted_episode_no_grasp": 2,
+  "camera_blackout": 1,
+  "dropped_outside_bowl": 1,
+  "failed_release_drop_outside": 1,
+  "missed_grasp": 12,
+  "missed_grasp_with_re_grasp": 1
+ },
+ "disagreements": [
+  {
+   "t_video": "05:13",
+   "seg": 59,
+   "telemetry_t_s": 313.87,
+   "issue": "Video shows a complete camera blackout (black frames from 05:13 to 05:16), while telemetry continues streaming valid static pose data (0.386, 0.098, 0.371) with no fault flag."
+  },
+  {
+   "t_video": "07:23",
+   "seg": 82,
+   "telemetry_t_s": 441.8,
+   "issue": "Video shows the robot colliding with and tipping the black bowl during placement, whereas telemetry shows a nominal grasp (gripper=0.58) and release trajectory indistinguishable from a clean episode."
+  },
+  {
+   "t_video": "15:20",
+   "seg": 174,
+   "telemetry_t_s": 920.27,
+   "issue": "Telemetry reports gripper=0.51 (indicating an object between the fingers) throughout the transport to the bowl (920.27s-921.07s), but the video shows the green block remaining on the table and the gripper moving empty."
+  }
+ ],
+ "legacy_hazard": {
+  "file": "brownfield_robot_inputs_candidate/inputs/legacy_code/references/rparak_SortingProductionLine_IRB1200/Backups/Controller1/RAPID/TASK2/PROGMOD/Module1.mod",
+  "lines": "104-118",
+  "why": "In PROC PP_TAB_CONV (and similarly PP_TAB_H in TASK2 and PP_TAB_CONV / PP_TP_AB in TASK1/Module1.mod lines 115-156, plus Maurilio97-P Module1.mod lines 69-83), gripping is purely open-loop: it issues PulseDO DO_SG_P, waits 0.25s, and unconditionally pulses the simulation attach signal (DO_ATT_TTAB) and executes the place trajectory without checking hand_ActualPosition or vacuum/sensor feedback to verify the part was actually grasped.",
+  "guarded_rapid": "MoveL Offs(Target_TAB_CONV,0,0,0),v100,fine,Servo\\WObj:=wobj0;\nWaitTime 0.25;\nPulseDO DO_SG_P;\nWaitTime 0.5;\nIF hand_ActualPosition_R > 5 AND hand_ActualPosition_R < 85 THEN\n    PulseDO DO_ATT_TTAB;\n    MoveL Offs(Target_TAB_CONV,0,0,200),r_str.r_param.speed,r_str.r_param.zone,Servo\\WObj:=wobj0;\nELSE\n    PulseDO DO_SG_R;\n    MoveL Offs(Target_TAB_CONV,0,0,200),r_str.r_param.speed,r_str.r_param.zone,Servo\\WObj:=wobj0;\n     r_str.actual_state := 2;\n    RETURN;\nENDIF"
+ },
+ "built_at": "2026-10-25 15:23:43"
+}

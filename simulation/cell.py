@@ -44,6 +44,7 @@ class Rig:
     fingers_closed: bool = False
     failed_attach: bool = False
     tool_key: tuple = None
+    attach_t: float = 0.0
     conf_check: dict = field(default_factory=lambda: {"ConfJ": True, "ConfL": True})
 
 
@@ -85,10 +86,13 @@ def initial_objects(displace=None):
 
 
 class World:
-    def __init__(self, rigs, faults=None, displace=None, t_max=240.0):
+    def __init__(self, rigs, faults=None, displace=None, t_max=240.0, sensor_delay=0.0, tray_shift=None, seed=None):
         self.rigs, self.objs = rigs, initial_objects(displace)
-        self.faults = dict(faults or {})          # kind -> "once" | "always"
+        self.faults = dict(faults or {})          # grip kind -> "once" | "always" | [attempt indices] | ("prob", p)
         self.fault_hits = {}
+        self.rng = np.random.default_rng(seed)
+        self.sensor_delay = sensor_delay          # s between a real grip and DI_GRIP_OK rising (held-out robustness test)
+        self.tray_shift = tray_shift              # mm offset applied to the tray when it reaches the conveyor end
         self.signals = {"DI_CONV_IN_POS": 0, "DO_ENABLE_CONV": 0}
         self.now, self.t_max = 0.0, t_max
         self.events, self.snapshots = [], []
@@ -120,8 +124,9 @@ class World:
         return name in self.signals or name.startswith(("DI_", "DO_"))
 
     def read_signal(self, task, name):
-        if name == "DI_GRIP_OK":  # proposed sensor, per robot
-            return int(self.task_robot[task.name].holding is not None)
+        if name == "DI_GRIP_OK":  # proposed sensor, per robot (optionally slow to rise)
+            rig = self.task_robot[task.name]
+            return int(rig.holding is not None and self.now - rig.attach_t >= self.sensor_delay - 1e-9)
         return self.signals.get(name, 0)
 
     # ---- instructions
@@ -175,8 +180,12 @@ class World:
         return v if isinstance(v, str) else str(v)
 
     # ---- motion
-    def _target_base(self, rig, rt):
+    def _target_base(self, rig, rt, wobj=None):
         p, q = np.array(rt[0], float), np.array(rt[1], float)
+        if isinstance(wobj, list):  # wobjdata [robhold, ufprog, ufmec, uframe, oframe]: target -> oframe -> uframe -> world
+            for fr in (wobj[4], wobj[3]):
+                fq = np.array(fr[1], float); fq = fq / np.linalg.norm(fq)
+                p = np.array(fr[0], float) + quat_to_mat(fq) @ p; q = quat_mul(fq, q)
         if rig.wobj0_is_world:
             p = quat_to_mat(rig.base_quat).T @ (p - rig.base_pos); q = quat_mul(quat_conj(rig.base_quat), q)
         return p / 1000.0, quat_to_mat(q), tuple(int(c) for c in rt[2])
@@ -184,7 +193,7 @@ class World:
     def move(self, task, rig, kind, args, opts, line):
         rt, speed, tool = args[0], args[1], args[3] if len(args) > 3 else None
         rob = self.robot(rig, tool)
-        p, R, conf = self._target_base(rig, rt)
+        p, R, conf = self._target_base(rig, rt, opts.get("WObj"))
         tgt_world = self._world_of(rig, p)
         if kind == "MoveJ":
             sols = rob.ik_all(p, R, n_seeds=24)
@@ -278,13 +287,15 @@ class World:
             self.log(task, "attach", obj=name, to=rig.robot_id, ok=False, reason=reason, line=line)
             return
         self._attach_to(o, rig.robot_id)
-        rig.holding, rig.failed_attach = name, False
+        rig.holding, rig.failed_attach, rig.attach_t = name, False, self.now
         self.log(task, "attach", obj=name, to=rig.robot_id, ok=True, line=line)
 
     def _inject(self, kind):
         mode = self.faults.get(kind)
         if not mode: return False
         n = self.fault_hits.get(kind, 0); self.fault_hits[kind] = n + 1
+        if isinstance(mode, (list, tuple)) and mode and mode[0] == "prob": return bool(self.rng.random() < mode[1])
+        if isinstance(mode, (list, tuple)): return n in mode
         return mode == "always" or (mode == "once" and n == 0)
 
     def detach(self, task, rig, name, line):
@@ -338,7 +349,13 @@ class World:
                     if o.on_conveyor and o.parent is None and o.pos[0] < R2_TAB_CONV[0]:
                         o.pos = o.pos + np.array([min(CONV_SPEED * DT, R2_TAB_CONV[0] - o.pos[0]), 0, 0])
         tray = self.objs["TRAY"]
-        self.signals["DI_CONV_IN_POS"] = int(tray.on_conveyor and tray.parent is None and tray.pos[0] >= R2_TAB_CONV[0] - 1.0)
+        in_pos = int(tray.on_conveyor and tray.parent is None and tray.pos[0] >= R2_TAB_CONV[0] - 1.0)
+        if in_pos and self.tray_shift is not None:  # held-out: tray lands off-centre at the conveyor end
+            d = np.asarray(self.tray_shift, float); self.tray_shift = None
+            for o in self.objs.values():
+                if o is tray or o.parent == "TRAY": o.pos = o.pos + d
+            self.log(None, "perturb", obj="TRAY", shift=d.tolist())
+        self.signals["DI_CONV_IN_POS"] = in_pos
         for o in self.objs.values():  # attached objects follow parents (robots first, then tray)
             if o.parent in self.rigs: self._follow(o)
         for o in self.objs.values():

@@ -1,0 +1,141 @@
+{
+ "proposal": {
+  "hazard": "Open-loop gripping in TASK2/Module1.mod (lines 104-118) and TASK1/Module1.mod (lines 115-156): the legacy code issues PulseDO DO_SG_P, waits 0.25s, and proceeds to the place trajectory without checking gripper position or sensor feedback, causing missed grasps (13 of 19 failures) to go completely undetected.",
+  "proposal": {
+   "signal": "DI_GripperClosedOnNothing (or DI_PartPresent)",
+   "meaning": "HIGH (1) when the gripper fingers reach the fully closed end-stop (stroke > 0.85), indicating the jaws closed on empty air rather than stalling on a block (~0.52).",
+   "hardware": "A magnetic reed switch or inductive proximity sensor mounted on the pneumatic/electric gripper cylinder at the full-closure end-stop, wired to the GoFa's available 24V Digital Input (either via the OmniCore controller I/O or the GoFa tool flange I/O).",
+   "rapid_usage": "After pulsing DO_SG_P and waiting 0.25s, check IF DI_GripperClosedOnNothing = 1 (or WaitDI for part presence with a timeout) to trigger a retry/re-grasp routine or raise an alarm before pulsing DO_ATT_TTAB and executing the place move."
+  },
+  "telemetry_rule": {
+   "description": "Flag a missed grasp when the gripper is commanded to close (action.gripper_position >= 0.80) and the measured finger position (observation.gripper_position) closes past 0.85, whereas a successful grasp on the block stalls around 0.52.",
+   "commanded_closed_min": 0.8,
+   "closed_on_nothing_min": 0.85
+  },
+  "cited_evidence": [
+   {
+    "t_video_s": 34.0,
+    "seg": 5,
+    "gripper": 0.94,
+    "what": "Gripper closes to 0.94 on empty air above the green block at (0.611, 0.280, 0.164); caught because 0.94 >= 0.85."
+   },
+   {
+    "t_video_s": 65.0,
+    "seg": 10,
+    "gripper": 0.97,
+    "what": "Gripper closes to 0.97 at z=0.192 while lifting away from the block; caught because 0.97 >= 0.85."
+   },
+   {
+    "t_video_s": 91.0,
+    "seg": 15,
+    "gripper": 0.96,
+    "what": "Gripper closes to 0.96 at (0.497, 0.219, 0.138) as block slips/is missed; caught because 0.96 >= 0.85."
+   },
+   {
+    "t_video_s": 251.13,
+    "seg": 46,
+    "gripper": 0.88,
+    "what": "First closure reaches 0.88 (missed grasp, caught because 0.88 >= 0.85), contrasting with the successful re-grasp at t=253.13s where gripper stalls on the block at 0.52 (< 0.85)."
+   }
+  ],
+  "expected_effect": "Eliminates silent dry-cycles by catching all 13 missed-grasp episodes (68% of all observed cell failures) immediately at the pick location, enabling automatic re-grasp (as demonstrated manually in seg 46) instead of executing empty place trajectories."
+ },
+ "verification": {
+  "rule": "observation.gripper_position >= 0.85 while action.gripper_position >= 0.8",
+  "by_label": {
+   "success": {
+    "flagged": 1,
+    "total": 200
+   },
+   "missed_grasp": {
+    "flagged": 11,
+    "total": 13
+   },
+   "incomplete_attempt_cause_unknown": {
+    "flagged": 0,
+    "total": 2
+   },
+   "no_visible_failure_source_label_discrepancy": {
+    "flagged": 0,
+    "total": 1
+   },
+   "contact_displacement": {
+    "flagged": 0,
+    "total": 2
+   }
+  },
+  "flagged": [
+   {
+    "seg": 5,
+    "label": "missed_grasp",
+    "peak": 0.947
+   },
+   {
+    "seg": 10,
+    "label": "missed_grasp",
+    "peak": 0.982
+   },
+   {
+    "seg": 15,
+    "label": "missed_grasp",
+    "peak": 0.956
+   },
+   {
+    "seg": 46,
+    "label": "success",
+    "peak": 0.859
+   },
+   {
+    "seg": 50,
+    "label": "missed_grasp",
+    "peak": 0.93
+   },
+   {
+    "seg": 63,
+    "label": "missed_grasp",
+    "peak": 0.903
+   },
+   {
+    "seg": 108,
+    "label": "missed_grasp",
+    "peak": 0.943
+   },
+   {
+    "seg": 149,
+    "label": "missed_grasp",
+    "peak": 0.991
+   },
+   {
+    "seg": 153,
+    "label": "missed_grasp",
+    "peak": 0.965
+   },
+   {
+    "seg": 165,
+    "label": "missed_grasp",
+    "peak": 0.991
+   },
+   {
+    "seg": 181,
+    "label": "missed_grasp",
+    "peak": 0.912
+   },
+   {
+    "seg": 183,
+    "label": "missed_grasp",
+    "peak": 0.912
+   }
+  ]
+ },
+ "call": {
+  "dir": "runs/sensor_20261025_152412",
+  "latency_s": 13.41
+ },
+ "approval": {
+  "approved": true,
+  "wired_as": "DI_GRIP_OK",
+  "by": "engineer",
+  "at": "2026-10-25 15:24:44",
+  "note": "proposed hardware addition; simulated in the twin as 1 while the gripper holds a part"
+ }
+}

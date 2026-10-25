@@ -8,6 +8,7 @@ Semantics notes (documented approximations):
   * RETRY re-executes the top-level statement of the routine in which the error occurred (max 4 retries).
   * An ERROR handler that ends without RETRY/TRYNEXT/RAISE/RETURN returns from the routine.
 """
+import copy
 import re
 
 import numpy as np
@@ -394,12 +395,15 @@ class Task:
         if scope is None:
             if root in self.globals: scope = self.globals
             else: raise RapidError(-1, f"assignment to undeclared {root}")
+        value = copy.deepcopy(value) if isinstance(value, (list, dict)) else value  # RAPID assigns by value
         if len(path) == 1: scope[root] = value; return
         obj = scope[root]
         for kind, key in path[1:-1]:
-            obj = obj[key] if kind == "field" else obj[int(self.eval(key[0], scopes)) - 1]
+            obj = (obj[key] if isinstance(obj, dict) else obj[_field_index(obj, key)]) if kind == "field" else obj[int(self.eval(key[0], scopes)) - 1]
         kind, key = path[-1]
-        if kind == "field": obj[key] = value
+        if kind == "field":
+            if isinstance(obj, dict): obj[key] = value
+            else: obj[_field_index(obj, key)] = value
         else: obj[int(self.eval(key[0], scopes)) - 1] = value
 
     # ---- expressions
@@ -575,10 +579,17 @@ class Ref:
     def set(self, value): self.task.store([("name", self.name)], value, self.scopes)
 
 
-def _robtarget_field(v, f):
-    if f == "trans": return v[0]
-    if f == "rot": return v[1]
-    if f == "robconf": return v[2]
-    if f == "extax": return v[3]
-    if f in ("x", "y", "z"): return v["xyz".index(f)]
+# Built-in RAPID records are held as aggregates (lists); component names map to positions.
+BUILTIN_FIELDS = dict(trans=0, rot=1, robconf=2, robhold=0, ufprog=1, ufmec=2, uframe=3, oframe=4, tframe=1, tload=2,
+                      x=0, y=1, z=2, q1=0, q2=1, q3=2, q4=3, cf1=0, cf4=1, cf6=2, cfx=3, robax=0, mass=0, cog=1, aom=2,
+                      **{f"rax_{i}": i - 1 for i in range(1, 7)}, **{f"eax_{c}": i for i, c in enumerate("abcdef")})
+
+
+def _field_index(v, f):
+    if f == "extax": return 1 if len(v) == 2 else 3   # jointtarget.extax vs robtarget.extax
+    if f in BUILTIN_FIELDS and BUILTIN_FIELDS[f] < len(v): return BUILTIN_FIELDS[f]
     raise RapidError(-1, f"no field {f}")
+
+
+def _robtarget_field(v, f):
+    return v[_field_index(v, f)]

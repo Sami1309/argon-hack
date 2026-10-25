@@ -48,8 +48,9 @@ def check_quarantine(text, sources):
     if hits: raise QuarantineViolation(f"answer-key literals in payload: {hits[:5]}")
 
 
-def call(parts, *, label, run_dir, schema=None, thinking="medium", fps=5, system=None):
-    """parts: list of dicts {kind: text|video, data: str|bytes, source: str}. Returns (parsed JSON or text, meta)."""
+def call(parts, *, label, run_dir, schema=None, json_out=False, thinking="medium", fps=5, system=None):
+    """parts: list of dicts {kind: text|video|file, data: str|bytes, source: str}. Returns (parsed JSON or text, meta).
+    kind=file sends a Files API uri (data) with its mime; json_out parses JSON without enforcing a schema."""
     run_dir = pathlib.Path(run_dir); run_dir.mkdir(parents=True, exist_ok=True)
     texts = "\n".join(p["data"] for p in parts if p["kind"] == "text") + (system or "")
     check_quarantine(texts, [p.get("source", "") for p in parts])
@@ -59,12 +60,14 @@ def call(parts, *, label, run_dir, schema=None, thinking="medium", fps=5, system
         manifest.append(dict(kind=p["kind"], source=p.get("source", "inline"), bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()[:16]))
         if p["kind"] == "text":
             gparts.append(types.Part(text=p["data"]))
+        elif p["kind"] == "file":
+            gparts.append(types.Part(file_data=types.FileData(file_uri=p["data"], mime_type=p["mime"]), video_metadata=types.VideoMetadata(fps=fps)))
         else:
             gparts.append(types.Part(inline_data=types.Blob(data=p["data"], mime_type="video/mp4"), video_metadata=types.VideoMetadata(fps=fps)))
     cfg = types.GenerateContentConfig(
         system_instruction=system, thinking_config=types.ThinkingConfig(thinking_level=thinking),
         media_resolution=types.MediaResolution.MEDIA_RESOLUTION_LOW,
-        response_mime_type="application/json" if schema else None, response_json_schema=schema)
+        response_mime_type="application/json" if (schema or json_out) else None, response_json_schema=schema)
     t = time.time()
     resp = client().models.generate_content(model=MODEL, contents=[types.Content(role="user", parts=gparts)], config=cfg)
     dt = time.time() - t
@@ -72,6 +75,7 @@ def call(parts, *, label, run_dir, schema=None, thinking="medium", fps=5, system
     meta = dict(label=label, model=MODEL, thinking=thinking, latency_s=round(dt, 2), parts=manifest, usage=usage,
                 quarantine="passed: no answer-key paths or GoFa target literals")
     (run_dir / f"{label}.manifest.json").write_text(json.dumps(meta, indent=1))
-    out = json.loads(resp.text) if schema else resp.text
-    (run_dir / f"{label}.response.json").write_text(json.dumps(out, indent=1) if schema else json.dumps({"text": out}))
+    as_json = bool(schema or json_out)
+    out = json.loads(resp.text) if as_json else resp.text
+    (run_dir / f"{label}.response.json").write_text(json.dumps(out, indent=1) if as_json else json.dumps({"text": out}))
     return out, meta
