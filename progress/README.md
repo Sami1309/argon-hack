@@ -256,6 +256,7 @@ Per loop iteration (300 cycles each) good boxes per 1,000 climb 0 → 0 → 743 
 | ![problem](img/dash_1_problem.jpeg) **1 Problem** | ![shift](img/dash_2_shift.jpeg) **2 Evidence: the shift** (footage, 218-episode strip, synced gripper trace, 755K-token context) |
 | ![evidence](img/dash_2_evidence.jpeg) **2 Evidence: the fix** (legacy grip lines, Argon's sensor proposal, Approve) | ![verbatim](img/dash_3_twin_verbatim.jpeg) **3 Twin: copying the code** (red = where copied targets land) |
 | ![catch](img/dash_3_twin_catch.jpeg) **3 Twin: the catch** (single pass + missed grasp) | ![loop](img/dash_4_loop.jpeg) **4 Loop** (Argon's view + pin, patch diff, training vs held-out climb, scenario matrix) |
+| ![live](img/dash_4_loop_live.jpeg) **4 Loop, live run** (real Argon calls from the 0% port: 0 → 100% in 6 iterations, 2:30) | |
 | ![proof](img/dash_5_proof.jpeg) **5 Proof: same fault** (engineer's port vs Argon looped; scoreboard) | ![handoff](img/dash_5_handoff.jpeg) **5 Proof: hand-off** (4 managed agents, all match; safe stop; ported RAPID + report) |
 
 The migration report (`MIGRATION_REPORT.md`, written by Argon in one long-decode call from the bundle's measured facts:

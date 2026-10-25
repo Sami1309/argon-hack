@@ -150,9 +150,9 @@ kbd { font: 600 11px var(--mono); border: 1px solid var(--line-2); border-bottom
 .chart .grid { stroke: var(--line); }
 .chart .ref { stroke: var(--text-3); stroke-dasharray: 4 4; }
 .tip { position: absolute; pointer-events: none; background: var(--surface-3); border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; z-index: 20; white-space: nowrap; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
-.matrix { display: grid; gap: 3px; align-items: center; font-size: 12px; }
+.matrix { display: grid; gap: 2px 3px; align-items: center; font-size: 12px; line-height: 1.3; }
 .matrix .rl { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
-.matrix .cell { width: 100%; aspect-ratio: 1; max-width: 16px; justify-self: center; border-radius: 3px; border: 1.5px solid var(--line-2); }
+.matrix .cell { width: 100%; aspect-ratio: 1; max-width: 14px; justify-self: center; border-radius: 3px; border: 1.5px solid var(--line-2); }
 .matrix .cell.pass.train { background: var(--blue); border-color: var(--blue); }
 .matrix .cell.pass.held { background: var(--orange); border-color: var(--orange); }
 .matrix .col-cur { background: var(--surface-2); border-radius: 4px; }
